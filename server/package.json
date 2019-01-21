@@ -1,0 +1,38 @@
+{
+  "name": "player",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.js",
+  "author": "Grégoire Verdier",
+  "license": "MIT",
+  "scripts": {
+    "start": "NODE_ENV=development node_modules/.bin/nodemon --exec 'yarn lint && node_modules/.bin/ts-node src/index.ts'",
+    "debug": "NODE_ENV=development node_modules/.bin/nodemon --exec 'yarn lint && node_modules/.bin/ts-node -d src/index.ts'",
+    "prod": "NODE_ENV=production node_modules/.bin/ts-node src/index.ts",
+    "lint": "node_modules/.bin/tslint 'src/**/*.ts' -t verbose --force",
+    "migrate:make": "node_modules/.bin/knex --knexfile ./config/knexfile.js migrate:make",
+    "migrate:latest": "node_modules/.bin/knex --knexfile ./config/knexfile.js migrate:latest",
+    "migrate:rollback": "node_modules/.bin/knex --knexfile ./config/knexfile.js migrate:rollback"
+  },
+  "dependencies": {
+    "config": "^3.0.1",
+    "inversify": "^5.0.1",
+    "knex": "^0.16.3",
+    "koa": "^2.6.2",
+    "koa-bodyparser": "^4.2.1",
+    "koa-tree-router": "^0.4.3",
+    "pg": "^7.8.0",
+    "winston": "^3.1.0"
+  },
+  "devDependencies": {
+    "@types/config": "^0.0.34",
+    "@types/koa": "^2.0.47",
+    "@types/koa-bodyparser": "^4.2.1",
+    "@types/winston": "^2.4.4",
+    "nodemon": "^1.18.7",
+    "ts-node": "^7.0.1",
+    "tslint": "^5.11.0",
+    "tslint-config-airbnb": "^5.11.1",
+    "typescript": "^3.2.2"
+  }
+}
