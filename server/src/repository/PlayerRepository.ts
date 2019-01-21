@@ -5,8 +5,8 @@ import { Player } from '../model/Player';
 
 export interface PlayerRepository {
   getAll(): Promise<Player[]>;
+  get(name: string): Promise<Player>;
   create(player: Player): Promise<Player>;
-  // get(id: string): Promise<Player>;
   // update(player: Player): Promise<Player>;
 }
 
@@ -17,7 +17,11 @@ export class PlayerRepositoryImpl implements PlayerRepository {
     return knex('players').select('*');
   }
 
-  public async create(player: Player): Promise<Player> {
-    return (await knex('players').insert(player).returning('*'))[0];
+  public get(name: string): Promise<Player> {
+    return knex('players').where({ name }).first();
+  }
+
+  public create(player: Player): Promise<Player> {
+    return knex('players').insert(player).returning('*').get(0);
   }
 }

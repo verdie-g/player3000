@@ -13,11 +13,16 @@ export class PlayerController implements RegistrableController {
 
   public register(router: Router) {
     router.get('/players', this.getPlayers.bind(this));
+    router.get('/players/:name', this.getPlayer.bind(this));
     router.post('/players', this.createPlayer.bind(this));
   }
 
   private async getPlayers(ctx: Koa.Context) {
     ctx.body = await this.playerService.getPlayers();
+  }
+
+  private async getPlayer(ctx: Koa.Context) {
+    ctx.body = await this.playerService.getPlayer(ctx.params.name);
   }
 
   private async createPlayer(ctx: Koa.Context) {
