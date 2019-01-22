@@ -9,6 +9,7 @@ export interface PlayerService {
   getPlayers(): Promise<Player[]>;
   getPlayer(name: string): Promise<Player>;
   createPlayer(player: Player): Promise<ServiceResult<Player>>;
+  deletePlayer(name: string): Promise<ServiceResult<void>>;
   // updatePlayer(player: Player): Promise<Player>;
 }
 
@@ -32,5 +33,14 @@ export class PlayerServiceImpl implements PlayerService {
 
     const created = await this.playerRepository.create(player);
     return ServiceResult.ok(ServiceCode.CREATED, created);
+  }
+
+  public async deletePlayer(name: string): Promise<ServiceResult<void>> {
+    if (!await this.playerRepository.exists(name)) {
+      return ServiceResult.error(ServiceCode.NOT_FOUND);
+    }
+
+    await this.playerRepository.delete(name);
+    return ServiceResult.ok(ServiceCode.NO_CONTENT, undefined);
   }
 }

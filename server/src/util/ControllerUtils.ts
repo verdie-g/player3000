@@ -11,7 +11,7 @@ export function foundOr404(ctx: Koa.Context, data: any) {
 
 export function serviceResultToResponse<T>(ctx: Koa.Context, res: ServiceResult<T>) {
   ctx.status = res.code;
-  if (res.ok) {
+  if (res.ok && res.data !== undefined) {
     ctx.body = res.data;
   }
 }

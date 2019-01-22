@@ -8,6 +8,7 @@ export interface PlayerRepository {
   get(name: string): Promise<Player>;
   create(player: Player): Promise<Player>;
   exists(name: string): Promise<boolean>;
+  delete(name: string): Promise<void>;
   // update(player: Player): Promise<Player>;
 }
 
@@ -28,5 +29,9 @@ export class PlayerRepositoryImpl implements PlayerRepository {
 
   public async exists(name: string): Promise<boolean> {
     return (await knex('players').where('name', name)).length > 0;
+  }
+
+  public async delete(name: string): Promise<void> {
+    return knex('players').where('name', name).del();
   }
 }
