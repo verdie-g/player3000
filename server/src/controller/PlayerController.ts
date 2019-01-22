@@ -5,6 +5,7 @@ import TYPES from '../types';
 import { PlayerService } from '../service/PlayerService';
 import { Player } from '../model/Player';
 import { RegistrableController } from './RegisterableController';
+import { foundOr404, serviceResultToResponse } from '../util/ControllerUtils';
 
 @injectable()
 export class PlayerController implements RegistrableController {
@@ -22,13 +23,14 @@ export class PlayerController implements RegistrableController {
   }
 
   private async getPlayer(ctx: Koa.Context) {
-    ctx.body = await this.playerService.getPlayer(ctx.params.name);
+    const player = await this.playerService.getPlayer(ctx.params.name);
+    foundOr404(ctx, player);
   }
 
   private async createPlayer(ctx: Koa.Context) {
     const { body } = ctx.request;
     const player = new Player(body.name);
-    ctx.body = await this.playerService.createPlayer(player);
-    ctx.status = 201;
+    const res = await this.playerService.createPlayer(player);
+    serviceResultToResponse(ctx, res);
   }
 }

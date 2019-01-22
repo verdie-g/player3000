@@ -7,6 +7,7 @@ export interface PlayerRepository {
   getAll(): Promise<Player[]>;
   get(name: string): Promise<Player>;
   create(player: Player): Promise<Player>;
+  exists(name: string): Promise<boolean>;
   // update(player: Player): Promise<Player>;
 }
 
@@ -18,10 +19,14 @@ export class PlayerRepositoryImpl implements PlayerRepository {
   }
 
   public get(name: string): Promise<Player> {
-    return knex('players').where({ name }).first();
+    return knex('players').where('name', name).first();
   }
 
   public create(player: Player): Promise<Player> {
     return knex('players').insert(player).returning('*').get(0);
+  }
+
+  public async exists(name: string): Promise<boolean> {
+    return (await knex('players').where('name', name)).length > 0;
   }
 }

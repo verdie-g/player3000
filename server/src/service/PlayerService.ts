@@ -2,12 +2,13 @@ import { injectable, inject } from 'inversify';
 import 'reflect-metadata';
 import { Player } from '../model/Player';
 import { PlayerRepository } from '../repository/PlayerRepository';
+import { ServiceResult, ServiceCode } from '../model/ServiceResult';
 import TYPES from '../types';
 
 export interface PlayerService {
   getPlayers(): Promise<Player[]>;
   getPlayer(name: string): Promise<Player>;
-  createPlayer(player: Player): Promise<Player>;
+  createPlayer(player: Player): Promise<ServiceResult<Player>>;
   // updatePlayer(player: Player): Promise<Player>;
 }
 
@@ -24,7 +25,12 @@ export class PlayerServiceImpl implements PlayerService {
     return this.playerRepository.get(name);
   }
 
-  public createPlayer(player: Player): Promise<Player> {
-    return this.playerRepository.create(player);
+  public async createPlayer(player: Player): Promise<ServiceResult<Player>> {
+    if (await this.playerRepository.exists(player.name)) {
+      return ServiceResult.error<Player>(ServiceCode.CONFLICT);
+    }
+
+    const created = await this.playerRepository.create(player);
+    return ServiceResult.ok(ServiceCode.CREATED, created);
   }
 }
