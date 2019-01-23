@@ -1,5 +1,4 @@
 import { injectable } from 'inversify';
-import 'reflect-metadata';
 import knex from './knex';
 import { Player } from '../model/Player';
 

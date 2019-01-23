@@ -1,5 +1,4 @@
 import { injectable, inject } from 'inversify';
-import 'reflect-metadata';
 import { Player } from '../model/Player';
 import { PlayerRepository } from '../repository/PlayerRepository';
 import { ServiceResult, ServiceCode } from '../model/ServiceResult';

@@ -1,7 +1,9 @@
 const TYPES = {
   Controller: Symbol('Controller'),
-  PlayerService: Symbol('PlayerService'),
+  MusicService: Symbol('MusicService'),
   PlayerRepository: Symbol('PlayerRepository'),
+  PlayerService: Symbol('PlayerService'),
+  YoutubeService: Symbol('YoutubeService'),
 };
 
 export default TYPES;
