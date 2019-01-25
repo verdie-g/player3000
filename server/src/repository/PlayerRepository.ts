@@ -4,10 +4,11 @@ import { Player } from '../model/Player';
 
 export interface PlayerRepository {
   getAll(): Promise<Player[]>;
-  get(name: string): Promise<Player>;
+  get(id: number): Promise<Player>;
   create(player: Player): Promise<Player>;
-  exists(name: string): Promise<boolean>;
-  delete(name: string): Promise<void>;
+  existsWithName(name: string): Promise<boolean>;
+  exists(id: number): Promise<boolean>;
+  delete(id: number): Promise<void>;
   // update(player: Player): Promise<Player>;
 }
 
@@ -18,19 +19,23 @@ export class PlayerRepositoryImpl implements PlayerRepository {
     return knex('players').select('*');
   }
 
-  public get(name: string): Promise<Player> {
-    return knex('players').where('name', name).first();
+  public get(id: number): Promise<Player> {
+    return knex('players').where('id', id).first();
   }
 
   public create(player: Player): Promise<Player> {
     return knex('players').insert(player).returning('*').get(0);
   }
 
-  public async exists(name: string): Promise<boolean> {
+  public async existsWithName(name: string): Promise<boolean> {
     return (await knex('players').where('name', name)).length > 0;
   }
 
-  public async delete(name: string): Promise<void> {
-    return knex('players').where('name', name).del();
+  public async exists(id: number): Promise<boolean> {
+    return (await knex('players').where('id', id)).length > 0;
+  }
+
+  public async delete(id: number): Promise<void> {
+    return knex('players').where('id', id).del();
   }
 }

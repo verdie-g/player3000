@@ -14,9 +14,9 @@ export class PlayerController implements RegistrableController {
 
   public register(router: Router) {
     router.get('/players', this.getPlayers.bind(this));
-    router.get('/players/:name', this.getPlayer.bind(this));
+    router.get('/players/:id', this.getPlayer.bind(this));
     router.post('/players', this.createPlayer.bind(this));
-    router.delete('/players/:name', this.deletePlayer.bind(this));
+    router.delete('/players/:id', this.deletePlayer.bind(this));
   }
 
   private async getPlayers(ctx: Koa.Context) {
@@ -24,7 +24,7 @@ export class PlayerController implements RegistrableController {
   }
 
   private async getPlayer(ctx: Koa.Context) {
-    const player = await this.playerService.getPlayer(ctx.params.name);
+    const player = await this.playerService.getPlayer(ctx.params.id);
     foundOr404(ctx, player);
   }
 
@@ -36,7 +36,7 @@ export class PlayerController implements RegistrableController {
   }
 
   private async deletePlayer(ctx: Koa.Context) {
-    const res = await this.playerService.deletePlayer(ctx.params.name);
+    const res = await this.playerService.deletePlayer(ctx.params.id);
     serviceResultToResponse(ctx, res);
   }
 }

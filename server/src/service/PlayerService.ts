@@ -6,9 +6,9 @@ import TYPES from '../types';
 
 export interface PlayerService {
   getPlayers(): Promise<Player[]>;
-  getPlayer(name: string): Promise<Player>;
+  getPlayer(id: number): Promise<Player>;
   createPlayer(player: Player): Promise<ServiceResult<Player>>;
-  deletePlayer(name: string): Promise<ServiceResult<void>>;
+  deletePlayer(id: number): Promise<ServiceResult<void>>;
   // updatePlayer(player: Player): Promise<Player>;
 }
 
@@ -21,12 +21,12 @@ export class PlayerServiceImpl implements PlayerService {
     return this.playerRepository.getAll();
   }
 
-  public getPlayer(name: string): Promise<Player> {
-    return this.playerRepository.get(name);
+  public getPlayer(id: number): Promise<Player> {
+    return this.playerRepository.get(id);
   }
 
   public async createPlayer(player: Player): Promise<ServiceResult<Player>> {
-    if (await this.playerRepository.exists(player.name)) {
+    if (await this.playerRepository.existsWithName(player.name)) {
       return ServiceResult.error<Player>(ServiceCode.CONFLICT);
     }
 
@@ -34,12 +34,12 @@ export class PlayerServiceImpl implements PlayerService {
     return ServiceResult.ok(ServiceCode.CREATED, created);
   }
 
-  public async deletePlayer(name: string): Promise<ServiceResult<void>> {
-    if (!await this.playerRepository.exists(name)) {
+  public async deletePlayer(id: number): Promise<ServiceResult<void>> {
+    if (!await this.playerRepository.exists(id)) {
       return ServiceResult.error(ServiceCode.NOT_FOUND);
     }
 
-    await this.playerRepository.delete(name);
+    await this.playerRepository.delete(id);
     return ServiceResult.ok(ServiceCode.NO_CONTENT, undefined);
   }
 }
