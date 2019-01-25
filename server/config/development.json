@@ -1,8 +1,4 @@
 {
   "port": 8000,
-  "knex": {
-    "connection": {
-      "user": "postgres"
-    }
-  }
+  "musicFolderPath": "./music"
 }

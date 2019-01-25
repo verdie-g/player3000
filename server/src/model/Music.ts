@@ -4,3 +4,13 @@ export class MusicSearch {
   public description: string;
   public thumbUrl: string;
 }
+
+export enum MusicDownloadState {
+  DOWNLOADING,
+  DOWNLOADED,
+}
+
+export class Music extends MusicSearch {
+  public downloadState: MusicDownloadState;
+  public id?: number;
+}

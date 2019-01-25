@@ -9,7 +9,6 @@ export interface PlayerService {
   getPlayer(id: number): Promise<Player>;
   createPlayer(player: Player): Promise<ServiceResult<Player>>;
   deletePlayer(id: number): Promise<ServiceResult<void>>;
-  // updatePlayer(player: Player): Promise<Player>;
 }
 
 @injectable()

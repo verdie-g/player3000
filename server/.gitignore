@@ -75,5 +75,8 @@ typings/
 # FuseBox cache
 .fusebox/
 
-#DynamoDB Local files
+# DynamoDB Local files
 .dynamodb/
+
+# player3000
+music/

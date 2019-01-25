@@ -9,8 +9,8 @@ import { foundOr404, serviceResultToResponse } from '../util/ControllerUtils';
 
 @injectable()
 export class PlayerController implements RegistrableController {
-  constructor(@inject(TYPES.PlayerService) private playerService: PlayerService) {
-  }
+  @inject(TYPES.PlayerService)
+  private playerService: PlayerService;
 
   public register(router: Router) {
     router.get('/players', this.getPlayers.bind(this));

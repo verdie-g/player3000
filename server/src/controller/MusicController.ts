@@ -12,10 +12,18 @@ export class MusicController implements RegistrableController {
 
   public register(router: Router) {
     router.get('/music/search', this.searchMusic.bind(this));
+    router.put('/players/:name/play', this.playMusic.bind(this));
   }
 
   private async searchMusic(ctx: Koa.Context) {
     const query = ctx.request.query.q;
     ctx.body = await this.musicService.searchMusic(query);
+  }
+
+  private async playMusic(ctx: Koa.Context) {
+    const { videoId } = ctx.request.body;
+    const playerName = ctx.params.name;
+    this.musicService.playMusic(playerName, videoId);
+    ctx.status = 202;
   }
 }
