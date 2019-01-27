@@ -6,12 +6,19 @@ import TYPES from './types';
 import container from './inversify.config';
 import { logger } from './util/Logger';
 import { RegistrableController } from './controller/RegisterableController';
+import { Route } from './middleware/Route';
+import { validate } from './middleware/Validator';
 
 const app = new Koa();
 const router = new Router();
 
 const controllers: RegistrableController[] = container.getAll<RegistrableController>(TYPES.Controller);
-controllers.forEach(ctrl => ctrl.register(router));
+controllers.forEach((ctrl) => {
+  const routes = ctrl.routes();
+  routes.forEach((route: Route) => {
+    router.on(route.method, route.path, validate(route.schemas), route.handler);
+  });
+});
 
 app.use(async (ctx, next) => {
   logger.info(`${ctx.method} ${ctx.path}`);

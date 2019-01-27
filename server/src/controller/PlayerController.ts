@@ -1,23 +1,60 @@
+import * as Joi from 'joi';
 import * as Koa from 'koa';
-import * as Router from 'koa-tree-router';
 import { injectable, inject } from 'inversify';
 import TYPES from '../types';
-import { PlayerService } from '../service/PlayerService';
 import { Player } from '../model/Player';
+import { PlayerService } from '../service/PlayerService';
 import { RegistrableController } from './RegisterableController';
 import { foundOr404, serviceResultToResponse } from '../util/ControllerUtils';
+import { Route } from '../middleware/Route';
 
 @injectable()
 export class PlayerController implements RegistrableController {
   @inject(TYPES.PlayerService)
   private playerService: PlayerService;
 
-  public register(router: Router) {
-    router.get('/players', this.getPlayers.bind(this));
-    router.get('/players/:id', this.getPlayer.bind(this));
-    router.post('/players', this.createPlayer.bind(this));
-    router.delete('/players/:id', this.deletePlayer.bind(this));
-    router.put('/players/:id/play', this.playMusic.bind(this));
+  public routes(): Route[] {
+    return [
+      {
+        method: 'GET',
+        path: '/players',
+        handler: this.getPlayers.bind(this),
+        schemas: {},
+      },
+      {
+        method: 'GET',
+        path: '/players/:id',
+        handler: this.getPlayer.bind(this),
+        schemas: {
+          params: { id: Joi.number().integer().required() },
+        },
+      },
+      {
+        method: 'POST',
+        path: '/players',
+        handler: this.createPlayer.bind(this),
+        schemas: {
+          body: { name: Joi.string().required() },
+        },
+      },
+      {
+        method: 'DELETE',
+        path: '/players/:id',
+        handler: this.deletePlayer.bind(this),
+        schemas: {
+          params: { id: Joi.number().integer().required() },
+        },
+      },
+      {
+        method: 'PUT',
+        path: '/players/:id/play',
+        handler: this.playMusic.bind(this),
+        schemas: {
+          params: { id: Joi.number().integer().required() },
+          body: { videoId: Joi.string().required() },
+        },
+      },
+    ];
   }
 
   private async getPlayers(ctx: Koa.Context) {

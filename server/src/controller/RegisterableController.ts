@@ -1,5 +1,5 @@
-import * as Router from 'koa-tree-router';
+import { Route } from '../middleware/Route';
 
 export interface RegistrableController {
-  register(router: Router);
+  routes(): Route[];
 }
