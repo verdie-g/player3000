@@ -1,4 +1,5 @@
 {
   "port": 8000,
-  "musicFolderPath": "./music"
+  "musicFolderPath": "./music",
+  "logLevel": "debug"
 }
