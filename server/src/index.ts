@@ -15,19 +15,14 @@ controllers.forEach(ctrl => ctrl.register(router));
 
 app.use(async (ctx, next) => {
   logger.info(`${ctx.method} ${ctx.path}`);
-  try {
-    await next();
-  } catch (err) {
-    ctx.status = err.status || 500;
-    ctx.app.emit('error', err, ctx);
-  }
+  await next();
 });
 
 app.use(bodyParser());
 app.use(router.routes());
 
 app.on('error', (err, ctx) => {
-  logger.error(err.message);
+  logger.error(`${err.message}: ${err.stack}`);
 });
 
 const port = config.get('port');
