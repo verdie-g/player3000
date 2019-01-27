@@ -1,6 +1,7 @@
 import { injectable } from 'inversify';
 import knex from './knex';
 import { Player } from '../model/Player';
+import { PlayerQueueItem } from '../model/PlayerQueue';
 
 export interface PlayerRepository {
   getAll(): Promise<Player[]>;
@@ -9,7 +10,7 @@ export interface PlayerRepository {
   existsWithName(name: string): Promise<boolean>;
   exists(id: number): Promise<boolean>;
   delete(id: number): Promise<void>;
-  // update(player: Player): Promise<Player>;
+  enqueueMusic(item: PlayerQueueItem): Promise<void>;
 }
 
 @injectable()
@@ -35,7 +36,11 @@ export class PlayerRepositoryImpl implements PlayerRepository {
     return (await knex('players').where('id', id)).length > 0;
   }
 
-  public async delete(id: number): Promise<void> {
+  public delete(id: number): Promise<void> {
     return knex('players').where('id', id).del();
+  }
+
+  public enqueueMusic(item: PlayerQueueItem): Promise<void> {
+    return knex('playerQueues').insert(item);
   }
 }

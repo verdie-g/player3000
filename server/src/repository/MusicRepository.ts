@@ -3,15 +3,15 @@ import knex from './knex';
 import { Music, MusicDownloadState } from '../model/Music';
 
 export interface MusicRepository {
-  existsWithVideoId(videoId: string): Promise<boolean>;
+  getByVideoId(videoId: string): Promise<Music>;
   create(music: Music): Promise<Music>;
   setDownloadState(id: number, downloadState: MusicDownloadState): Promise<void>;
 }
 
 @injectable()
 export class MusicRepositoryImpl implements MusicRepository {
-  public async existsWithVideoId(videoId: string): Promise<boolean> {
-    return (await knex('musics').where('videoId', videoId)).length > 0;
+  public getByVideoId(videoId: string): Promise<Music> {
+    return knex('musics').where('videoId', videoId).first();
   }
 
   public create(music: Music): Promise<Music> {

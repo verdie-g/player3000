@@ -8,7 +8,7 @@ import { YoutubeService, YouTubeResponse, YouTubeSearchResults } from './Youtube
 
 export interface MusicService {
   searchMusic(query: string): Promise<MusicSearch[]>;
-  playMusic(playerName: string, videoId: string): void;
+  downloadMusic(videoId: string): Promise<Music>;
 }
 
 @injectable()
@@ -32,9 +32,10 @@ export class MusicServiceImpl implements MusicService {
     }));
   }
 
-  public async playMusic(playerName: string, videoId: string) {
-    if (!(await this.musicRepository.existsWithVideoId(videoId))) {
-      const music = await this.musicRepository.create({
+  public async downloadMusic(videoId: string): Promise<Music> {
+    let music = await this.musicRepository.getByVideoId(videoId);
+    if (!music) {
+      music = await this.musicRepository.create({
         videoId,
         title: '',
         description: '',
@@ -46,10 +47,10 @@ export class MusicServiceImpl implements MusicService {
       this.youtubeDownloaderService.downloadMusic(req);
     }
 
-    // add videoId to queue
+    return music;
   }
 
-  private async onMusicDownloadEnd(videoId: string, musicId: number) {
+  private async onMusicDownloadEnd(_: string, musicId: number) {
     await this.musicRepository.setDownloadState(musicId, MusicDownloadState.DOWNLOADED);
   }
 }

@@ -17,6 +17,7 @@ export class PlayerController implements RegistrableController {
     router.get('/players/:id', this.getPlayer.bind(this));
     router.post('/players', this.createPlayer.bind(this));
     router.delete('/players/:id', this.deletePlayer.bind(this));
+    router.put('/players/:id/play', this.playMusic.bind(this));
   }
 
   private async getPlayers(ctx: Koa.Context) {
@@ -38,5 +39,12 @@ export class PlayerController implements RegistrableController {
   private async deletePlayer(ctx: Koa.Context) {
     const res = await this.playerService.deletePlayer(ctx.params.id);
     serviceResultToResponse(ctx, res);
+  }
+
+  private async playMusic(ctx: Koa.Context) {
+    const { videoId } = ctx.request.body;
+    const playerId = ctx.params.id;
+    await this.playerService.playMusic(playerId, videoId);
+    ctx.status = 202;
   }
 }

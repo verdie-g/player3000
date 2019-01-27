@@ -1,18 +1,24 @@
 import { injectable, inject } from 'inversify';
+import TYPES from '../types';
+import { MusicService } from '../service/MusicService';
 import { Player } from '../model/Player';
+import { PlayerQueueItem } from '../model/PlayerQueue';
 import { PlayerRepository } from '../repository/PlayerRepository';
 import { ServiceResult, ServiceCode } from '../model/ServiceResult';
-import TYPES from '../types';
 
 export interface PlayerService {
   getPlayers(): Promise<Player[]>;
   getPlayer(id: number): Promise<Player>;
   createPlayer(player: Player): Promise<ServiceResult<Player>>;
   deletePlayer(id: number): Promise<ServiceResult<void>>;
+  playMusic(playerId: number, videoId: string): Promise<void>;
 }
 
 @injectable()
 export class PlayerServiceImpl implements PlayerService {
+  @inject(TYPES.MusicService)
+  private musicService: MusicService;
+
   @inject(TYPES.PlayerRepository)
   private playerRepository: PlayerRepository;
 
@@ -40,5 +46,14 @@ export class PlayerServiceImpl implements PlayerService {
 
     await this.playerRepository.delete(id);
     return ServiceResult.ok(ServiceCode.NO_CONTENT, undefined);
+  }
+
+  public async playMusic(playerId: number, videoId: string) {
+    const music = await this.musicService.downloadMusic(videoId);
+
+    await this.playerRepository.enqueueMusic({
+      playerId,
+      musicId: music.id,
+    });
   }
 }
