@@ -4,3 +4,10 @@ export function getOr(obj: any, key: string, or: any) {
   }
   return or;
 }
+
+export function copyValues(dst: any, src: any): any {
+  Object.keys(src).forEach((key: string) => {
+    dst[key] = src[key];
+  });
+  return dst;
+}

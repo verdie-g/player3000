@@ -1,6 +1,7 @@
 import * as Joi from 'joi';
 import * as Router from 'koa-tree-router';
 import { ParameterSchemas } from './Route';
+import { copyValues } from '../util/ObjectUtil';
 
 function validateObject(schema: Joi.SchemaMap, o: any, ctx: Router.IRouterContext): boolean {
   if (schema === undefined) {
@@ -14,6 +15,7 @@ function validateObject(schema: Joi.SchemaMap, o: any, ctx: Router.IRouterContex
     return false;
   }
 
+  copyValues(o, result.value);
   return true;
 }
 
