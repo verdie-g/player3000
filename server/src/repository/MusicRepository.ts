@@ -6,6 +6,7 @@ export interface MusicRepository {
   getByVideoId(videoId: string): Promise<Music>;
   create(music: Music): Promise<Music>;
   setDownloadState(id: number, downloadState: MusicDownloadState): Promise<void>;
+  getDownloadedMusics(videoIdIn: string[]): Promise<any>;
 }
 
 @injectable()
@@ -20,5 +21,12 @@ export class MusicRepositoryImpl implements MusicRepository {
 
   public setDownloadState(id: number, downloadState: MusicDownloadState): Promise<void> {
     return knex('musics').where('id', id).update({ downloadState });
+  }
+
+  public getDownloadedMusics(videoIdIn: string[]): Promise<any> {
+    return knex('musics')
+      .where('downloadState', MusicDownloadState.DOWNLOADING)
+      .orWhere('downloadState', MusicDownloadState.DOWNLOADED)
+      .select('videoId', 'downloadState');
   }
 }

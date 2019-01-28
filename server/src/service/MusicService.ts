@@ -1,13 +1,14 @@
 import { injectable, inject } from 'inversify';
 import TYPES from '../types';
 import { MusicRepository } from '../repository/MusicRepository';
-import { MusicSearch, Music, MusicDownloadState } from '../model/Music';
+import { Music, MusicDownloadState } from '../model/Music';
 import { YoutubeDownloadRequest } from '../model/YoutubeDownloadRequest';
 import { YoutubeDownloaderService } from '../service/YoutubeDownloaderService';
 import { YoutubeService, YouTubeResponse, YouTubeSearchResults } from './YoutubeService';
+import { getOr } from '../util/ObjectUtil';
 
 export interface MusicService {
-  searchMusic(query: string): Promise<MusicSearch[]>;
+  searchMusic(query: string): Promise<Music[]>;
   downloadMusic(videoId: string): Promise<Music>;
 }
 
@@ -22,13 +23,23 @@ export class MusicServiceImpl implements MusicService {
   @inject(TYPES.MusicRepository)
   private musicRepository: MusicRepository;
 
-  public async searchMusic(query: string): Promise<MusicSearch[]> {
+  public async searchMusic(query: string): Promise<Music[]> {
     const ytRes: YouTubeResponse = await this.youtubeService.search(query);
+    const videoIds = ytRes.results.map((result: YouTubeSearchResults) => result.id);
+
+    const downloadedByVideoIds =
+      (await this.musicRepository.getDownloadedMusics(videoIds))
+      .reduce((acc: any, curr: any) => {
+        acc[curr.videoId] = curr.downloadState;
+        return acc;
+      }, {});
+
     return ytRes.results.map((result: YouTubeSearchResults) => ({
       videoId: result.id,
       title: result.title,
       description: result.description,
       thumbUrl: result.thumbnails.default.url,
+      downloadState: getOr(downloadedByVideoIds, result.id, MusicDownloadState.NOT_DOWNLOADED),
     }));
   }
 
