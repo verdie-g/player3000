@@ -45,7 +45,7 @@ export class PlayerServiceImpl implements PlayerService {
     }
 
     await this.playerRepository.delete(id);
-    return ServiceResult.ok(ServiceCode.NO_CONTENT, undefined);
+    return ServiceResult.ok(ServiceCode.NO_CONTENT);
   }
 
   public async playMusic(playerId: number, videoId: string) {

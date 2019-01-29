@@ -18,7 +18,7 @@ export class ServiceResult<T> {
     };
   }
 
-  static ok<T>(code: ServiceCode, data: T): ServiceResult<T> {
+  static ok<T>(code: ServiceCode, data?: T): ServiceResult<T> {
     return {
       code,
       data,
