@@ -6,15 +6,15 @@ export enum ServiceCode {
 }
 
 export class ServiceResult<T> {
-  public ok: boolean;
   public code: ServiceCode;
   public data?: T;
+  public ok: boolean;
 
   static error<T>(code: ServiceCode): ServiceResult<T> {
     return {
       code,
-      ok: false,
       data: null,
+      ok: false,
     };
   }
 
