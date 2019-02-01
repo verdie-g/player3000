@@ -4,8 +4,7 @@ const TYPES = {
   MusicService: Symbol('MusicService'),
   PlayerRepository: Symbol('PlayerRepository'),
   PlayerService: Symbol('PlayerService'),
-  YoutubeDownloaderService: Symbol('YoutubeDownloaderService'),
-  YoutubeService: Symbol('YoutubeService'),
+  YoutubeRepository: Symbol('YoutubeRepository'),
 };
 
 export default TYPES;

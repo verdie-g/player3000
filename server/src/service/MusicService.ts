@@ -1,10 +1,9 @@
 import { injectable, inject } from 'inversify';
 import TYPES from '../types';
-import { MusicRepository } from '../repository/MusicRepository';
 import { Music, MusicDownloadState } from '../model/Music';
+import { MusicRepository } from '../repository/MusicRepository';
 import { YoutubeDownloadRequest } from '../model/YoutubeDownloadRequest';
-import { YoutubeDownloaderService } from '../service/YoutubeDownloaderService';
-import { YoutubeService, YouTubeResponse, YouTubeSearchResults } from './YoutubeService';
+import { YoutubeRepository, YouTubeResponse, YouTubeSearchResults } from '../repository/YoutubeRepository';
 import { getOr } from '../util/ObjectUtil';
 
 export interface MusicService {
@@ -14,17 +13,14 @@ export interface MusicService {
 
 @injectable()
 export class MusicServiceImpl implements MusicService {
-  @inject(TYPES.YoutubeService)
-  private youtubeService: YoutubeService;
-
-  @inject(TYPES.YoutubeDownloaderService)
-  private youtubeDownloaderService: YoutubeDownloaderService;
+  @inject(TYPES.YoutubeRepository)
+  private youtubeRepository: YoutubeRepository;
 
   @inject(TYPES.MusicRepository)
   private musicRepository: MusicRepository;
 
   public async searchMusic(query: string): Promise<Music[]> {
-    const ytRes: YouTubeResponse = await this.youtubeService.search(query);
+    const ytRes: YouTubeResponse = await this.youtubeRepository.search(query);
     const videoIds = ytRes.results.map((result: YouTubeSearchResults) => result.id);
 
     const downloadedByVideoIds =
@@ -55,7 +51,7 @@ export class MusicServiceImpl implements MusicService {
       });
 
       const req = new YoutubeDownloadRequest(videoId, this.onMusicDownloadEnd.bind(this), music.id);
-      this.youtubeDownloaderService.downloadMusic(req);
+      this.youtubeRepository.downloadMusic(req);
     }
 
     return music;

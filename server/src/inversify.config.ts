@@ -8,8 +8,7 @@ import { PlayerController } from './controller/PlayerController';
 import { PlayerRepository, PlayerRepositoryImpl } from './repository/PlayerRepository';
 import { PlayerService, PlayerServiceImpl } from './service/PlayerService';
 import { RegistrableController } from './controller/RegisterableController';
-import { YoutubeDownloaderService, YoutubeDownloaderServiceImpl } from './service/YoutubeDownloaderService';
-import { YoutubeService, YoutubeServiceImpl } from './service/YoutubeService';
+import { YoutubeRepository, YoutubeRepositoryImpl } from './repository/YoutubeRepository';
 
 const container = new Container();
 container.bind<MusicRepository>(TYPES.MusicRepository).to(MusicRepositoryImpl);
@@ -18,7 +17,6 @@ container.bind<PlayerRepository>(TYPES.PlayerRepository).to(PlayerRepositoryImpl
 container.bind<PlayerService>(TYPES.PlayerService).to(PlayerServiceImpl);
 container.bind<RegistrableController>(TYPES.Controller).to(MusicController);
 container.bind<RegistrableController>(TYPES.Controller).to(PlayerController);
-container.bind<YoutubeService>(TYPES.YoutubeService).to(YoutubeServiceImpl);
-container.bind<YoutubeDownloaderService>(TYPES.YoutubeDownloaderService).to(YoutubeDownloaderServiceImpl).inSingletonScope();
+container.bind<YoutubeRepository>(TYPES.YoutubeRepository).to(YoutubeRepositoryImpl);
 
 export default container;
