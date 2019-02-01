@@ -3,7 +3,6 @@ import { injectable, inject } from 'inversify';
 import TYPES from '../types';
 import { Music, MusicDownloadState } from '../model/Music';
 import { MusicRepository } from '../repository/MusicRepository';
-import { YoutubeDownloadRequest } from '../model/YoutubeDownloadRequest';
 import { YoutubeRepository, YouTubeResponse, YouTubeSearchResults } from '../repository/YoutubeRepository';
 import { getOr } from '../util/ObjectUtil';
 
@@ -53,14 +52,11 @@ export class MusicServiceImpl implements MusicService {
         downloadState: MusicDownloadState.DOWNLOADING,
       });
 
-      const req = new YoutubeDownloadRequest(info, this.onMusicDownloadEnd.bind(this), music.id);
-      this.youtubeRepository.downloadMusic(req);
+      this.youtubeRepository.downloadMusic(info).then(async () => {
+        await this.musicRepository.setDownloadState(music.id, MusicDownloadState.DOWNLOADED);
+      });
     }
 
     return music;
-  }
-
-  private async onMusicDownloadEnd(_: ytdl.videoInfo, musicId: number) {
-    await this.musicRepository.setDownloadState(musicId, MusicDownloadState.DOWNLOADED);
   }
 }

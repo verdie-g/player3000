@@ -4,7 +4,6 @@ import * as path from 'path';
 import * as youtubeSearch from 'youtube-search';
 import * as ytdl from 'ytdl-core';
 import { injectable } from 'inversify';
-import { YoutubeDownloadRequest } from '../model/YoutubeDownloadRequest';
 import { logger } from '../util/Logger';
 
 export { YouTubeThumbnail, YouTubeSearchResultThumbnails, YouTubeSearchResults, YouTubeSearchPageResults } from 'youtube-search';
@@ -17,7 +16,7 @@ export interface YouTubeResponse {
 export interface YoutubeRepository {
   search(term: string): Promise<YouTubeResponse>;
   getInfo(videoId: string): Promise<ytdl.videoInfo>;
-  downloadMusic(req: YoutubeDownloadRequest): void;
+  downloadMusic(videoInfo: ytdl.videoInfo): Promise<ytdl.videoInfo>;
 }
 
 const YOUTUBE_API_KEY: string = config.get('youtubeApiKey');
@@ -42,22 +41,24 @@ export class YoutubeRepositoryImpl implements YoutubeRepository  {
     return ytdl.getInfo(videoId);
   }
 
-  public downloadMusic(req: YoutubeDownloadRequest) {
-    const stream = ytdl.downloadFromInfo(req.videoInfo, {
-      quality: 'highestaudio',
-      filter: 'audioonly',
-    })
-    .on('progress', (chunkLength: number, downloaded: number, total: number) => {
-      const percent = Number(100 * downloaded / total).toFixed(2);
-      logger.info(`${req.videoInfo.title}: downloading ${percent}%...`);
-    })
-    .on('end', () => {
-      logger.info(`${req.videoInfo.title}: end download`);
-      req.cb(req.videoInfo, req.cbData);
-    });
+  public downloadMusic(videoInfo: ytdl.videoInfo): Promise<ytdl.videoInfo> {
+    return new Promise((resolve, _) => {
+      const stream = ytdl.downloadFromInfo(videoInfo, {
+        quality: 'highestaudio',
+        filter: 'audioonly',
+      })
+      .on('progress', (chunkLength: number, downloaded: number, total: number) => {
+        const percent = Number(100 * downloaded / total).toFixed(2);
+        logger.info(`${videoInfo.title}: downloading ${percent}%...`);
+      })
+      .on('end', () => {
+        logger.info(`${videoInfo.title}: end download`);
+        resolve(videoInfo);
+      });
 
-    const musicPath = path.join(MUSIC_FOLDER, req.videoInfo.title);
-    logger.info(`${req.videoInfo.title}: start downloading to ${musicPath}`);
-    stream.pipe(fs.createWriteStream(musicPath));
+      const musicPath = path.join(MUSIC_FOLDER, videoInfo.title);
+      logger.info(`${videoInfo.title}: start downloading to ${musicPath}`);
+      stream.pipe(fs.createWriteStream(musicPath));
+    });
   }
 }
