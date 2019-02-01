@@ -1,3 +1,4 @@
+import * as ytdl from 'ytdl-core';
 import { injectable, inject } from 'inversify';
 import TYPES from '../types';
 import { Music, MusicDownloadState } from '../model/Music';
@@ -42,22 +43,24 @@ export class MusicServiceImpl implements MusicService {
   public async downloadMusic(videoId: string): Promise<Music> {
     let music = await this.musicRepository.getByVideoId(videoId);
     if (!music) {
+      const info = await this.youtubeRepository.getInfo(videoId);
+
       music = await this.musicRepository.create({
         videoId,
-        title: '',
-        description: '',
-        thumbUrl: '',
+        title: info.title,
+        description: info.description,
+        thumbUrl: info.thumbnail_url,
         downloadState: MusicDownloadState.DOWNLOADING,
       });
 
-      const req = new YoutubeDownloadRequest(videoId, this.onMusicDownloadEnd.bind(this), music.id);
+      const req = new YoutubeDownloadRequest(info, this.onMusicDownloadEnd.bind(this), music.id);
       this.youtubeRepository.downloadMusic(req);
     }
 
     return music;
   }
 
-  private async onMusicDownloadEnd(_: string, musicId: number) {
+  private async onMusicDownloadEnd(_: ytdl.videoInfo, musicId: number) {
     await this.musicRepository.setDownloadState(musicId, MusicDownloadState.DOWNLOADED);
   }
 }

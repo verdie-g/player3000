@@ -16,6 +16,7 @@ export interface YouTubeResponse {
 
 export interface YoutubeRepository {
   search(term: string): Promise<YouTubeResponse>;
+  getInfo(videoId: string): Promise<ytdl.videoInfo>;
   downloadMusic(req: YoutubeDownloadRequest): void;
 }
 
@@ -37,22 +38,26 @@ export class YoutubeRepositoryImpl implements YoutubeRepository  {
     return youtubeSearch(term, searchOptions);
   }
 
+  public getInfo(videoId: string): Promise<ytdl.videoInfo> {
+    return ytdl.getInfo(videoId);
+  }
+
   public downloadMusic(req: YoutubeDownloadRequest) {
-    const stream = ytdl(req.videoId, {
+    const stream = ytdl.downloadFromInfo(req.videoInfo, {
       quality: 'highestaudio',
       filter: 'audioonly',
     })
     .on('progress', (chunkLength: number, downloaded: number, total: number) => {
       const percent = Number(100 * downloaded / total).toFixed(2);
-      logger.info(`${req.videoId}: downloading ${percent}%...`);
+      logger.info(`${req.videoInfo.title}: downloading ${percent}%...`);
     })
     .on('end', () => {
-      logger.info(`${req.videoId}: end download`);
-      req.cb(req.videoId, req.cbData);
+      logger.info(`${req.videoInfo.title}: end download`);
+      req.cb(req.videoInfo, req.cbData);
     });
 
-    const musicPath = path.join(MUSIC_FOLDER, req.videoId);
-    logger.info(`${req.videoId}: start downloading to ${musicPath}`);
+    const musicPath = path.join(MUSIC_FOLDER, req.videoInfo.title);
+    logger.info(`${req.videoInfo.title}: start downloading to ${musicPath}`);
     stream.pipe(fs.createWriteStream(musicPath));
   }
 }

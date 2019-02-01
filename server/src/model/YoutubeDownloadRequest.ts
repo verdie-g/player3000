@@ -1,7 +1,9 @@
+import * as ytdl from 'ytdl-core';
+
 export class YoutubeDownloadRequest {
   constructor(
-    public videoId: string,
-    public cb: (videoId: string, data?: any) => void,
+    public videoInfo: ytdl.videoInfo,
+    public cb: (videoInfo: ytdl.videoInfo, data?: any) => void,
     public cbData?: any,
   ) {
   }
