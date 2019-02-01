@@ -24,8 +24,8 @@ export class MusicServiceImpl implements MusicService {
     const ytRes: YouTubeResponse = await this.youtubeRepository.search(query);
     const videoIds = ytRes.results.map((result: YouTubeSearchResults) => result.id);
 
-    const downloadedByVideoIds =
-      (await this.musicRepository.getDownloadedMusics(videoIds))
+    const downloadStatesByVideoId =
+      (await this.musicRepository.getDownloadStates(videoIds))
       .reduce((acc: any, curr: any) => {
         acc[curr.videoId] = curr.downloadState;
         return acc;
@@ -36,7 +36,7 @@ export class MusicServiceImpl implements MusicService {
       title: result.title,
       description: result.description,
       thumbUrl: result.thumbnails.default.url,
-      downloadState: getOr(downloadedByVideoIds, result.id, MusicDownloadState.NOT_DOWNLOADED),
+      downloadState: getOr(downloadStatesByVideoId, result.id, MusicDownloadState.NOT_DOWNLOADED),
     }));
   }
 

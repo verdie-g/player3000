@@ -1,3 +1,4 @@
+import * as Knex from 'knex';
 import { injectable } from 'inversify';
 import knex from './knex';
 import { Music, MusicDownloadState } from '../model/Music';
@@ -6,7 +7,7 @@ export interface MusicRepository {
   getByVideoId(videoId: string): Promise<Music>;
   create(music: Music): Promise<Music>;
   setDownloadState(id: number, downloadState: MusicDownloadState): Promise<void>;
-  getDownloadedMusics(videoIdIn: string[]): Promise<any>;
+  getDownloadStates(videoIdIn: string[]): Promise<any>;
 }
 
 @injectable()
@@ -23,10 +24,9 @@ export class MusicRepositoryImpl implements MusicRepository {
     return knex('musics').where('id', id).update({ downloadState });
   }
 
-  public getDownloadedMusics(videoIdIn: string[]): Promise<any> {
+  public getDownloadStates(videoIdIn: string[]): Promise<any> {
     return knex('musics')
-      .where('downloadState', MusicDownloadState.DOWNLOADING)
-      .orWhere('downloadState', MusicDownloadState.DOWNLOADED)
+      .whereIn('videoId', videoIdIn)
       .select('videoId', 'downloadState');
   }
 }
