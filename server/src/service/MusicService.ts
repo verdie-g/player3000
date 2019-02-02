@@ -34,6 +34,7 @@ export class MusicServiceImpl implements MusicService {
       videoId: result.id,
       title: result.title,
       description: result.description,
+      duration: 0, // youtube-search module doesn't expose all youtube api fields
       thumbUrl: result.thumbnails.default.url,
       downloadState: getOr(downloadStatesByVideoId, result.id, MusicDownloadState.NOT_DOWNLOADED),
     }));
@@ -48,6 +49,7 @@ export class MusicServiceImpl implements MusicService {
         videoId,
         title: info.title,
         description: info.description,
+        duration: parseInt(info.length_seconds, 10),
         thumbUrl: info.thumbnail_url,
         downloadState: MusicDownloadState.DOWNLOADING,
       });
