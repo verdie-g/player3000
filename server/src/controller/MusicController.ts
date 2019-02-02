@@ -21,11 +21,25 @@ export class MusicController implements RegistrableController {
           query: { q: Joi.string().required() },
         },
       },
+      {
+        method: 'PUT',
+        path: '/musics/play',
+        handler: this.playMusic.bind(this),
+        schemas: {
+          body: { videoId: Joi.string().required() },
+        },
+      },
     ];
   }
 
   private async searchMusic(ctx: Koa.Context) {
     const query = ctx.request.query.q;
     ctx.body = await this.musicService.searchMusic(query);
+  }
+
+  private async playMusic(ctx: Koa.Context) {
+    const { videoId } = ctx.request.body;
+    await this.musicService.playMusic(videoId);
+    ctx.status = 202;
   }
 }

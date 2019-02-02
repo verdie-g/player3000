@@ -1,4 +1,3 @@
-import * as ytdl from 'ytdl-core';
 import { injectable, inject } from 'inversify';
 import TYPES from '../types';
 import { Music, MusicDownloadState } from '../model/Music';
@@ -8,7 +7,7 @@ import { getOr } from '../util/ObjectUtil';
 
 export interface MusicService {
   searchMusic(query: string): Promise<Music[]>;
-  downloadMusic(videoId: string): Promise<Music>;
+  playMusic(videoId: string): void;
 }
 
 @injectable()
@@ -40,7 +39,11 @@ export class MusicServiceImpl implements MusicService {
     }));
   }
 
-  public async downloadMusic(videoId: string): Promise<Music> {
+  public async playMusic(videoId: string) {
+    await this.downloadMusic(videoId);
+  }
+
+  private async downloadMusic(videoId: string): Promise<Music> {
     let music = await this.musicRepository.getByVideoId(videoId);
     if (!music) {
       const info = await this.youtubeRepository.getInfo(videoId);
@@ -55,6 +58,7 @@ export class MusicServiceImpl implements MusicService {
       });
 
       this.youtubeRepository.downloadMusic(info).then(async () => {
+        music.downloadState = MusicDownloadState.DOWNLOADED;
         await this.musicRepository.setDownloadState(music.id, MusicDownloadState.DOWNLOADED);
       });
     }
