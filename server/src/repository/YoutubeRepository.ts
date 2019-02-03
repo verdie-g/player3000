@@ -47,7 +47,7 @@ export class YoutubeRepositoryImpl implements YoutubeRepository  {
         quality: 'highestaudio',
         filter: 'audioonly',
       })
-      .on('progress', (chunkLength: number, downloaded: number, total: number) => {
+      .on('progress', (_: number, downloaded: number, total: number) => {
         const percent = Number(100 * downloaded / total).toFixed(2);
         logger.info(`${videoInfo.title}: downloading ${percent}%...`);
       })

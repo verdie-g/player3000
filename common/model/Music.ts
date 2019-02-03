@@ -4,12 +4,12 @@ export enum MusicDownloadState {
   DOWNLOADED,
 }
 
-export class Music {
-  public videoId: string;
-  public title: string;
-  public description: string;
-  public duration: number;
-  public thumbUrl: string;
-  public downloadState: MusicDownloadState;
-  public id?: number;
+export interface Music {
+  videoId: string;
+  title: string;
+  description: string;
+  duration: number;
+  thumbUrl: string;
+  downloadState: MusicDownloadState;
+  id?: number;
 }

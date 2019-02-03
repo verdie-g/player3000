@@ -28,7 +28,7 @@ app.use(async (ctx, next) => {
 app.use(bodyParser());
 app.use(router.routes());
 
-app.on('error', (err, ctx) => {
+app.on('error', (err, _) => {
   logger.error(`${err.message}: ${err.stack}`);
 });
 

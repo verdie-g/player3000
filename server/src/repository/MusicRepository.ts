@@ -1,4 +1,3 @@
-import * as Knex from 'knex';
 import { injectable } from 'inversify';
 import knex from './knex';
 import { Music, MusicDownloadState } from '../model/Music';

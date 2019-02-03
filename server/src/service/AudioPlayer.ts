@@ -9,7 +9,7 @@ import { logger } from '../util/Logger';
 
 export interface AudioPlayer {
   getPlaylist(): Playlist;
-  enqueue(music: Music, downloadPromise: Promise<void>): void;
+  enqueue(music: Music, downloadPromise?: Promise<void>): void;
   play(): void;
   stop(): void;
   next(): void;
@@ -22,13 +22,13 @@ const MUSIC_FOLDER: string = config.get('musicFolderPath');
 export class AudioPlayerImpl implements AudioPlayer {
   private queue: PlayerQueueItem[];
   private currentMusicIdx: number;
-  private vlcProcess: ChildProcess;
+  private vlcProcess?: ChildProcess;
   private playing: boolean;
 
   constructor() {
     this.queue = [];
     this.currentMusicIdx = 0;
-    this.vlcProcess = null;
+    this.vlcProcess = undefined;
     this.playing = false;
   }
 
@@ -40,15 +40,11 @@ export class AudioPlayerImpl implements AudioPlayer {
   }
 
   public enqueue(music: Music, downloadPromise: Promise<void>) {
-    const item: PlayerQueueItem = {
-      music,
-      downloadPromise,
-      ready: downloadPromise === null,
-    };
+    const item = new PlayerQueueItem(music, downloadPromise);
     this.queue.push(item);
 
     if (!item.ready) {
-      item.downloadPromise.then(() => { item.ready = true; });
+      item.downloadPromise!.then(() => { item.ready = true; });
     }
 
     if (!this.playing) {
@@ -68,7 +64,7 @@ export class AudioPlayerImpl implements AudioPlayer {
     if (current.ready) {
       this.spawnVlc(current.music);
     } else {
-      current.downloadPromise.then(() => {
+      current.downloadPromise!.then(() => {
         const oldIdx = this.currentMusicIdx;
         const newIdx = (() => this.currentMusicIdx)();
         logger.debug(`oldIdx: ${oldIdx}, newIdx: ${newIdx}`);
@@ -86,7 +82,7 @@ export class AudioPlayerImpl implements AudioPlayer {
       logger.debug('kill vlc');
       this.vlcProcess.removeAllListeners('exit');
       this.vlcProcess.kill();
-      this.vlcProcess = null;
+      this.vlcProcess = undefined;
     }
     this.playing = false;
   }
@@ -121,7 +117,7 @@ export class AudioPlayerImpl implements AudioPlayer {
         const log = code === 0 ? logger.info : logger.error;
         log(`cvlc: exited with code ${code}`);
 
-        this.vlcProcess = null;
+        this.vlcProcess = undefined;
         this.playing = false;
         this.next();
       });

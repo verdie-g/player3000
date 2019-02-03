@@ -3,7 +3,7 @@ import * as Router from 'koa-tree-router';
 import { ParameterSchemas } from './Route';
 import { copyValues } from '../util/ObjectUtil';
 
-function validateObject(schema: Joi.SchemaMap, o: any, ctx: Router.IRouterContext): boolean {
+function validateObject(o: any, ctx: Router.IRouterContext, schema?: Joi.SchemaMap): boolean {
   if (schema === undefined) {
     return true;
   }
@@ -21,9 +21,9 @@ function validateObject(schema: Joi.SchemaMap, o: any, ctx: Router.IRouterContex
 
 export function validate(paramSchemas: ParameterSchemas): Router.IMiddleware {
   return async (ctx: Router.IRouterContext, next: () => Promise<any>) => {
-    if (!validateObject(paramSchemas.params, ctx.params, ctx)
-      || !validateObject(paramSchemas.body, ctx.request.body, ctx)
-      || !validateObject(paramSchemas.query, ctx.request.query, ctx)) {
+    if (!validateObject(ctx.params, ctx, paramSchemas.params)
+      || !validateObject(ctx.request.body, ctx, paramSchemas.body)
+      || !validateObject(ctx.request.query, ctx, paramSchemas.query)) {
       return;
     }
 

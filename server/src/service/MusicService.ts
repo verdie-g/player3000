@@ -22,13 +22,13 @@ export interface MusicService {
 @injectable()
 export class MusicServiceImpl implements MusicService {
   @inject(TYPES.AudioPlayer)
-  private audioPlayer: AudioPlayer;
+  private audioPlayer!: AudioPlayer;
 
   @inject(TYPES.YoutubeRepository)
-  private youtubeRepository: YoutubeRepository;
+  private youtubeRepository!: YoutubeRepository;
 
   @inject(TYPES.MusicRepository)
-  private musicRepository: MusicRepository;
+  private musicRepository!: MusicRepository;
 
   public async searchMusic(query: string): Promise<Music[]> {
     const ytRes: YouTubeResponse = await this.youtubeRepository.search(query);
@@ -46,7 +46,7 @@ export class MusicServiceImpl implements MusicService {
       title: result.title,
       description: result.description,
       duration: 0, // youtube-search module doesn't expose all youtube api fields
-      thumbUrl: result.thumbnails.default.url,
+      thumbUrl: result.thumbnails.default!.url,
       downloadState: getOr(downloadStatesByVideoId, result.id, MusicDownloadState.NOT_DOWNLOADED),
     }));
   }
@@ -58,7 +58,7 @@ export class MusicServiceImpl implements MusicService {
   public async enqueueMusic(videoId: string): Promise<ServiceResult<Music>> {
     let music = await this.musicRepository.getByVideoId(videoId);
     if (music) {
-      this.audioPlayer.enqueue(music, null);
+      this.audioPlayer.enqueue(music);
       return ServiceResult.ok(ServiceCode.ACCEPTED, music);
     }
 
@@ -105,6 +105,6 @@ export class MusicServiceImpl implements MusicService {
   private async downloadMusic(music: Music, info: ytdl.videoInfo): Promise<void> {
     await this.youtubeRepository.downloadMusic(info);
     music.downloadState = MusicDownloadState.DOWNLOADED;
-    await this.musicRepository.setDownloadState(music.id, MusicDownloadState.DOWNLOADED);
+    await this.musicRepository.setDownloadState(music.id!, MusicDownloadState.DOWNLOADED);
   }
 }

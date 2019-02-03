@@ -7,23 +7,18 @@ export enum ServiceCode {
 }
 
 export class ServiceResult<T> {
-  public code: ServiceCode;
-  public data?: T;
-  public ok: boolean;
+  constructor(
+    public code: ServiceCode,
+    public ok: boolean,
+    public data?: T,
+  ) {
+  }
 
   static error<T>(code: ServiceCode): ServiceResult<T> {
-    return {
-      code,
-      data: null,
-      ok: false,
-    };
+    return new ServiceResult(code, false);
   }
 
   static ok<T>(code: ServiceCode, data?: T): ServiceResult<T> {
-    return {
-      code,
-      data,
-      ok: true,
-    };
+    return new ServiceResult(code, true, data);
   }
 }

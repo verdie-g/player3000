@@ -1,5 +1,4 @@
 import * as knex from 'knex';
-import { logger } from '../util/Logger';
 
 const environment = process.env.ENVIRONMENT || 'development';
 const knexConf: knex.Config = require('../../config/knexfile')[environment];
