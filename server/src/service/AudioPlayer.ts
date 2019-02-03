@@ -3,10 +3,13 @@ import * as path from 'path';
 import { injectable } from 'inversify';
 import { ChildProcess, spawn } from 'child_process';
 import { Music } from '../model/Music';
+import { PlayerQueueItem } from '../model/PlayerQueueItem';
+import { Playlist } from '../model/Playlist';
 import { logger } from '../util/Logger';
 
 export interface AudioPlayer {
-  enqueue(music: Music | Promise<Music>): void;
+  getPlaylist(): Playlist;
+  enqueue(music: Music, downloadPromise: Promise<void>): void;
   play(): void;
   stop(): void;
   next(): void;
@@ -17,7 +20,7 @@ const MUSIC_FOLDER: string = config.get('musicFolderPath');
 
 @injectable()
 export class AudioPlayerImpl implements AudioPlayer {
-  private queue: (Music | Promise<Music>)[];
+  private queue: PlayerQueueItem[];
   private currentMusicIdx: number;
   private vlcProcess: ChildProcess;
   private playing: boolean;
@@ -29,14 +32,23 @@ export class AudioPlayerImpl implements AudioPlayer {
     this.playing = false;
   }
 
-  public enqueue(music: Music | Promise<Music>) {
-    const idx = this.queue.push(music) - 1;
-    if (music instanceof Promise) {
-      const musicPromise = music as Promise<Music>;
-      musicPromise.then((m) => {
-        this.queue[idx] = m;
-        return m;
-      });
+  public getPlaylist(): Playlist {
+    return {
+      queue: this.queue.map(item => item.music),
+      currentIdx: this.currentMusicIdx,
+    };
+  }
+
+  public enqueue(music: Music, downloadPromise: Promise<void>) {
+    const item: PlayerQueueItem = {
+      music,
+      downloadPromise,
+      ready: downloadPromise === null,
+    };
+    this.queue.push(item);
+
+    if (!item.ready) {
+      item.downloadPromise.then(() => { item.ready = true; });
     }
 
     if (!this.playing) {
@@ -53,18 +65,18 @@ export class AudioPlayerImpl implements AudioPlayer {
 
     this.playing = true;
     const current = this.queue[this.currentMusicIdx];
-    if (current instanceof Promise) {
-      current.then((music) => {
+    if (current.ready) {
+      this.spawnVlc(current.music);
+    } else {
+      current.downloadPromise.then(() => {
         const oldIdx = this.currentMusicIdx;
         const newIdx = (() => this.currentMusicIdx)();
         logger.debug(`oldIdx: ${oldIdx}, newIdx: ${newIdx}`);
         logger.debug(`vlcProcess: ${this.vlcProcess}`);
         if (oldIdx === newIdx && this.vlcProcess === null) {
-          this.spawnVlc(music);
+          this.spawnVlc(current.music);
         }
       });
-    } else {
-      this.spawnVlc(current);
     }
   }
 

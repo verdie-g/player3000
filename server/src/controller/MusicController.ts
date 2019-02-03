@@ -23,8 +23,14 @@ export class MusicController implements RegistrableController {
         },
       },
       {
+        method: 'GET',
+        path: '/playlist',
+        handler: this.getPlaylist.bind(this),
+        schemas: {},
+      },
+      {
         method: 'POST',
-        path: '/musics/playlist',
+        path: '/playlist',
         handler: this.enqueueMusic.bind(this),
         schemas: {
           body: { videoId: Joi.string().required() },
@@ -32,25 +38,25 @@ export class MusicController implements RegistrableController {
       },
       {
         method: 'PUT',
-        path: '/musics/play',
+        path: '/playlist/play',
         handler: this.playMusic.bind(this),
         schemas: {},
       },
       {
         method: 'PUT',
-        path: '/musics/stop',
+        path: '/playlist/stop',
         handler: this.stopMusic.bind(this),
         schemas: {},
       },
       {
         method: 'PUT',
-        path: '/musics/next',
+        path: '/playlist/next',
         handler: this.nextMusic.bind(this),
         schemas: {},
       },
       {
         method: 'PUT',
-        path: '/musics/previous',
+        path: '/playlist/previous',
         handler: this.previousMusic.bind(this),
         schemas: {},
       },
@@ -60,6 +66,10 @@ export class MusicController implements RegistrableController {
   private async searchMusic(ctx: Koa.Context) {
     const query = ctx.request.query.q;
     ctx.body = await this.musicService.searchMusic(query);
+  }
+
+  private getPlaylist(ctx: Koa.Context) {
+    ctx.body = this.musicService.getPlaylist();
   }
 
   private async enqueueMusic(ctx: Koa.Context) {

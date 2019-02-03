@@ -4,12 +4,14 @@ import TYPES from '../types';
 import { AudioPlayer } from './AudioPlayer';
 import { Music, MusicDownloadState } from '../model/Music';
 import { MusicRepository } from '../repository/MusicRepository';
+import { Playlist } from '../model/Playlist';
 import { ServiceResult, ServiceCode } from '../model/ServiceResult';
 import { YoutubeRepository, YouTubeResponse, YouTubeSearchResults } from '../repository/YoutubeRepository';
 import { getOr } from '../util/ObjectUtil';
 
 export interface MusicService {
   searchMusic(query: string): Promise<Music[]>;
+  getPlaylist(): Playlist;
   enqueueMusic(videoId: string): Promise<ServiceResult<Music>>;
   playMusic(): void;
   stopMusic(): void;
@@ -49,10 +51,14 @@ export class MusicServiceImpl implements MusicService {
     }));
   }
 
+  public getPlaylist(): Playlist {
+    return this.audioPlayer.getPlaylist();
+  }
+
   public async enqueueMusic(videoId: string): Promise<ServiceResult<Music>> {
     let music = await this.musicRepository.getByVideoId(videoId);
     if (music) {
-      this.audioPlayer.enqueue(music);
+      this.audioPlayer.enqueue(music, null);
       return ServiceResult.ok(ServiceCode.ACCEPTED, music);
     }
 
@@ -65,7 +71,7 @@ export class MusicServiceImpl implements MusicService {
 
     music = await this.createMusicFromVideoInfo(info);
     const downloadPromise = this.downloadMusic(music, info);
-    this.audioPlayer.enqueue(downloadPromise);
+    this.audioPlayer.enqueue(music, downloadPromise);
     return ServiceResult.ok(ServiceCode.ACCEPTED, music);
   }
 
@@ -96,10 +102,9 @@ export class MusicServiceImpl implements MusicService {
     });
   }
 
-  private async downloadMusic(music: Music, info: ytdl.videoInfo): Promise<Music> {
+  private async downloadMusic(music: Music, info: ytdl.videoInfo): Promise<void> {
     await this.youtubeRepository.downloadMusic(info);
     music.downloadState = MusicDownloadState.DOWNLOADED;
     await this.musicRepository.setDownloadState(music.id, MusicDownloadState.DOWNLOADED);
-    return music;
   }
 }
