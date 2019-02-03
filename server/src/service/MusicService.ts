@@ -1,17 +1,27 @@
+import * as ytdl from 'ytdl-core';
 import { injectable, inject } from 'inversify';
 import TYPES from '../types';
+import { AudioPlayer } from './AudioPlayer';
 import { Music, MusicDownloadState } from '../model/Music';
 import { MusicRepository } from '../repository/MusicRepository';
+import { ServiceResult, ServiceCode } from '../model/ServiceResult';
 import { YoutubeRepository, YouTubeResponse, YouTubeSearchResults } from '../repository/YoutubeRepository';
 import { getOr } from '../util/ObjectUtil';
 
 export interface MusicService {
   searchMusic(query: string): Promise<Music[]>;
-  playMusic(videoId: string): void;
+  enqueueMusic(videoId: string): Promise<ServiceResult<Music>>;
+  playMusic(): void;
+  stopMusic(): void;
+  nextMusic(): void;
+  previousMusic(): void;
 }
 
 @injectable()
 export class MusicServiceImpl implements MusicService {
+  @inject(TYPES.AudioPlayer)
+  private audioPlayer: AudioPlayer;
+
   @inject(TYPES.YoutubeRepository)
   private youtubeRepository: YoutubeRepository;
 
@@ -39,30 +49,57 @@ export class MusicServiceImpl implements MusicService {
     }));
   }
 
-  public async playMusic(videoId: string) {
-    await this.downloadMusic(videoId);
-  }
-
-  private async downloadMusic(videoId: string): Promise<Music> {
+  public async enqueueMusic(videoId: string): Promise<ServiceResult<Music>> {
     let music = await this.musicRepository.getByVideoId(videoId);
-    if (!music) {
-      const info = await this.youtubeRepository.getInfo(videoId);
-
-      music = await this.musicRepository.create({
-        videoId,
-        title: info.title,
-        description: info.description,
-        duration: parseInt(info.length_seconds, 10),
-        thumbUrl: info.thumbnail_url,
-        downloadState: MusicDownloadState.DOWNLOADING,
-      });
-
-      this.youtubeRepository.downloadMusic(info).then(async () => {
-        music.downloadState = MusicDownloadState.DOWNLOADED;
-        await this.musicRepository.setDownloadState(music.id, MusicDownloadState.DOWNLOADED);
-      });
+    if (music) {
+      this.audioPlayer.enqueue(music);
+      return ServiceResult.ok(ServiceCode.ACCEPTED, music);
     }
 
+    let info: ytdl.videoInfo;
+    try {
+      info = await this.youtubeRepository.getInfo(videoId);
+    } catch (e) {
+      return ServiceResult.error(ServiceCode.NOT_FOUND);
+    }
+
+    music = await this.createMusicFromVideoInfo(info);
+    const downloadPromise = this.downloadMusic(music, info);
+    this.audioPlayer.enqueue(downloadPromise);
+    return ServiceResult.ok(ServiceCode.ACCEPTED, music);
+  }
+
+  public playMusic() {
+    this.audioPlayer.play();
+  }
+
+  public stopMusic() {
+    this.audioPlayer.stop();
+  }
+
+  public nextMusic() {
+    this.audioPlayer.next();
+  }
+
+  public previousMusic() {
+    this.audioPlayer.previous();
+  }
+
+  private createMusicFromVideoInfo(info: ytdl.videoInfo): Promise<Music> {
+    return this.musicRepository.create({
+      videoId: info.video_id,
+      title: info.title,
+      description: info.description,
+      duration: parseInt(info.length_seconds, 10),
+      thumbUrl: info.thumbnail_url,
+      downloadState: MusicDownloadState.DOWNLOADING,
+    });
+  }
+
+  private async downloadMusic(music: Music, info: ytdl.videoInfo): Promise<Music> {
+    await this.youtubeRepository.downloadMusic(info);
+    music.downloadState = MusicDownloadState.DOWNLOADED;
+    await this.musicRepository.setDownloadState(music.id, MusicDownloadState.DOWNLOADED);
     return music;
   }
 }

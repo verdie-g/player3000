@@ -5,6 +5,7 @@ import TYPES from '../types';
 import { MusicService } from '../service/MusicService';
 import { RegistrableController } from './RegisterableController';
 import { Route } from '../middleware/Route';
+import { serviceResultToResponse } from '../util/ControllerUtils';
 
 @injectable()
 export class MusicController implements RegistrableController {
@@ -22,12 +23,36 @@ export class MusicController implements RegistrableController {
         },
       },
       {
-        method: 'PUT',
-        path: '/musics/play',
-        handler: this.playMusic.bind(this),
+        method: 'POST',
+        path: '/musics/playlist',
+        handler: this.enqueueMusic.bind(this),
         schemas: {
           body: { videoId: Joi.string().required() },
         },
+      },
+      {
+        method: 'PUT',
+        path: '/musics/play',
+        handler: this.playMusic.bind(this),
+        schemas: {},
+      },
+      {
+        method: 'PUT',
+        path: '/musics/stop',
+        handler: this.stopMusic.bind(this),
+        schemas: {},
+      },
+      {
+        method: 'PUT',
+        path: '/musics/next',
+        handler: this.nextMusic.bind(this),
+        schemas: {},
+      },
+      {
+        method: 'PUT',
+        path: '/musics/previous',
+        handler: this.previousMusic.bind(this),
+        schemas: {},
       },
     ];
   }
@@ -37,9 +62,29 @@ export class MusicController implements RegistrableController {
     ctx.body = await this.musicService.searchMusic(query);
   }
 
-  private async playMusic(ctx: Koa.Context) {
+  private async enqueueMusic(ctx: Koa.Context) {
     const { videoId } = ctx.request.body;
-    await this.musicService.playMusic(videoId);
+    const res = await this.musicService.enqueueMusic(videoId);
+    serviceResultToResponse(ctx, res);
+  }
+
+  private async playMusic(ctx: Koa.Context) {
+    await this.musicService.playMusic();
+    ctx.status = 202;
+  }
+
+  private async stopMusic(ctx: Koa.Context) {
+    await this.musicService.stopMusic();
+    ctx.status = 202;
+  }
+
+  private async nextMusic(ctx: Koa.Context) {
+    await this.musicService.nextMusic();
+    ctx.status = 202;
+  }
+
+  private async previousMusic(ctx: Koa.Context) {
+    await this.musicService.previousMusic();
     ctx.status = 202;
   }
 }
