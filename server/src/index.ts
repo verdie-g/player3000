@@ -22,6 +22,7 @@ controllers.forEach((ctrl) => {
 
 app.use(async (ctx, next) => {
   logger.info(`${ctx.method} ${ctx.path}`);
+  ctx.set('Access-Control-Allow-Origin', '*');
   await next();
 });
 
