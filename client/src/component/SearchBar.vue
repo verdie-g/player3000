@@ -6,6 +6,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
+import debounce from 'debounce';
 
 import musicService from '../service/MusicService';
 
@@ -14,10 +15,10 @@ import musicService from '../service/MusicService';
 })
 export default class SearchBar extends Vue {
   query: string = '';
+  searchDebounce = debounce((query: string) => this.search(query), 250);
 
   onChange(e: any) {
-    console.log(e.data);
-    this.search(e.data);
+    this.searchDebounce(e.data);
   }
 
   async search(query: string) {
