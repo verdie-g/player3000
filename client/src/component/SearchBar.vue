@@ -17,7 +17,7 @@ import musicService from '../service/MusicService';
 export default class SearchBar extends Vue {
   query: string = '';
   requestsSent: number = 0;
-  searchDebounce = debounce((query: string) => this.search(query), 250);
+  searchDebounce = debounce((query: string) => this.search(query), 300);
 
   get loading(): boolean {
     return this.requestsSent !== 0;
