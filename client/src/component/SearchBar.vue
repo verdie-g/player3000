@@ -1,6 +1,7 @@
 <template>
   <div>
     <input type="text" v-model="query" @input="onChange" />
+    <div v-if="loading">Loading...</div>
   </div>
 </template>
 
@@ -15,15 +16,21 @@ import musicService from '../service/MusicService';
 })
 export default class SearchBar extends Vue {
   query: string = '';
+  requestsSent: number = 0;
   searchDebounce = debounce((query: string) => this.search(query), 250);
+
+  get loading(): boolean {
+    return this.requestsSent !== 0;
+  }
 
   onChange(e: any) {
     this.searchDebounce(e.data);
   }
 
   async search(query: string) {
+    this.requestsSent += 1;
     const musics = await musicService.search(query);
-    console.log(musics);
+    this.requestsSent -= 1;
   }
 }
 </script>
