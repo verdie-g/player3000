@@ -24,7 +24,7 @@ export default class SearchBar extends Vue {
   }
 
   onChange(e: any) {
-    this.searchDebounce(e.data);
+    this.searchDebounce(this.query);
   }
 
   async search(query: string) {
