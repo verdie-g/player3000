@@ -1,5 +1,9 @@
 const BASE_URL = 'http://localhost:8000';
 
+const HEADERS = new Headers({
+  'Content-Type': 'application/json; charset=utf-8',
+});
+
 class ApiService {
   public get(url: string): Promise<any> {
     return this.req('GET', url);
@@ -20,8 +24,14 @@ class ApiService {
   private async req(method: string, url: string, body?: any): Promise<any> {
     const res = await fetch(BASE_URL + url, {
       method,
-      body,
+      body: JSON.stringify(body),
+      headers: HEADERS,
     });
+
+    if (res.status === 204) {
+      return undefined;
+    }
+
     return res!.json();
   }
 }

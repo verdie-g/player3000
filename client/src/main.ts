@@ -1,4 +1,4 @@
-import Icon from 'vue-awesome/components/Icon.vue'
+import Icon from 'vue-awesome/components/Icon.vue';
 import Vue from 'vue';
 
 import App from './App.vue';
