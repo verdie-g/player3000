@@ -10,6 +10,7 @@
   "dependencies": {
     "debounce": "^1.2.0",
     "vue": "^2.5.22",
+    "vue-awesome": "^3.4.0",
     "vue-class-component": "^6.0.0",
     "vue-property-decorator": "^7.0.0"
   },
