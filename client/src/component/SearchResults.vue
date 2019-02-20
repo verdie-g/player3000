@@ -1,7 +1,9 @@
 <template>
-  <div>
-    search results
-  </div>
+  <ul>
+    <li v-for="music in musics" :key="music.videoId" @click="onSelect(music)">
+      {{music.title}}
+    </li>
+  </ul>
 </template>
 
 <script lang="ts">
@@ -13,7 +15,11 @@ import { Music } from '../model/Music';
   components: {},
 })
 export default class SearchResults extends Vue {
-  // @Prop(Array) musics!: Music[];
+  @Prop(Array) musics!: Music[];
+
+  onSelect(music: Music) {
+    this.$emit('select', music);
+  }
 }
 </script>
 

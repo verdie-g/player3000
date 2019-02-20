@@ -28,11 +28,11 @@ export default class SearchBar extends Vue {
   }
 
   async search(query: string) {
-    this.$emit('start:search', query);
+    this.$emit('searchStart', query);
     this.requestsSent += 1;
     const musics = await musicService.search(query);
     this.requestsSent -= 1;
-    this.$emit('end:search', musics);
+    this.$emit('searchEnd', musics);
   }
 }
 </script>
