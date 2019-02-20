@@ -1,7 +1,8 @@
 import * as Koa from 'koa';
 import * as Router from 'koa-tree-router';
-import * as config from 'config';
 import * as bodyParser from 'koa-bodyparser';
+import * as config from 'config';
+import * as cors from '@koa/cors';
 import TYPES from './types';
 import container from './inversify.config';
 import { logger } from './util/Logger';
@@ -22,10 +23,10 @@ controllers.forEach((ctrl) => {
 
 app.use(async (ctx, next) => {
   logger.info(`${ctx.method} ${ctx.path}`);
-  ctx.set('Access-Control-Allow-Origin', '*');
   await next();
 });
 
+app.use(cors({ origin: '*' }));
 app.use(bodyParser());
 app.use(router.routes());
 
