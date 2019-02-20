@@ -1,6 +1,5 @@
 <template>
   <div>
-    search
     <SearchBar @searchEnd="onSearchEnd" />
     <SearchResults :musics="musics" @select="(m) => $emit('select', m)" />
   </div>
