@@ -27,7 +27,7 @@ export class AudioPlayerImpl implements AudioPlayer {
 
   constructor() {
     this.queue = [];
-    this.currentMusicIdx = 0;
+    this.currentMusicIdx = -1;
     this.vlcProcess = undefined;
     this.playing = false;
   }
@@ -48,7 +48,7 @@ export class AudioPlayerImpl implements AudioPlayer {
     }
 
     if (!this.playing) {
-      this.play();
+      this.next();
     }
   }
 
