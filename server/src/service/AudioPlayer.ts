@@ -39,7 +39,7 @@ export class AudioPlayerImpl implements AudioPlayer {
     };
   }
 
-  public enqueue(music: Music, downloadPromise: Promise<void>) {
+  public enqueue(music: Music, downloadPromise?: Promise<void>) {
     const item = new PlayerQueueItem(music, downloadPromise);
     this.queue.push(item);
 
@@ -54,8 +54,14 @@ export class AudioPlayerImpl implements AudioPlayer {
 
   public play() {
     logger.debug('play');
-    if (this.playing || this.currentMusicIdx >= this.queue.length) {
-      logger.debug('already playing or out of bound');
+
+    if (this.playing) {
+      logger.debug('already playing');
+      return;
+    }
+
+    if (this.currentMusicIdx >= this.queue.length) {
+      logger.debug('out of bound');
       return;
     }
 
@@ -67,9 +73,8 @@ export class AudioPlayerImpl implements AudioPlayer {
       current.downloadPromise!.then(() => {
         const oldIdx = this.currentMusicIdx;
         const newIdx = (() => this.currentMusicIdx)();
-        logger.debug(`oldIdx: ${oldIdx}, newIdx: ${newIdx}`);
-        logger.debug(`vlcProcess: ${this.vlcProcess}`);
-        if (oldIdx === newIdx && this.vlcProcess === null) {
+        logger.debug(`oldIdx: ${oldIdx}, newIdx: ${newIdx}, vlcProcess: ${this.vlcProcess}`);
+        if (oldIdx === newIdx && this.vlcProcess === undefined) {
           this.spawnVlc(current.music);
         }
       });
