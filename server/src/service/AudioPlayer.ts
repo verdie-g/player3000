@@ -22,8 +22,8 @@ const MUSIC_FOLDER: string = config.get('musicFolderPath');
 export class AudioPlayerImpl implements AudioPlayer {
   private queue: PlayerQueueItem[];
   private currentMusicIdx: number;
-  private vlcProcess?: ChildProcess;
-  private playing: boolean;
+  private playing: boolean;          // player is waiting for a download to start or is playing
+  private vlcProcess?: ChildProcess; // if !== undefined => playing = true and a music is necessarily playing
 
   constructor() {
     this.queue = [];
@@ -67,18 +67,29 @@ export class AudioPlayerImpl implements AudioPlayer {
 
     this.playing = true;
     const current = this.queue[this.currentMusicIdx];
+
     if (current.ready) {
       this.spawnVlc(current.music);
-    } else {
-      current.downloadPromise!.then(() => {
-        const oldIdx = this.currentMusicIdx;
-        const newIdx = (() => this.currentMusicIdx)();
-        logger.debug(`oldIdx: ${oldIdx}, newIdx: ${newIdx}, vlcProcess: ${this.vlcProcess}`);
-        if (oldIdx === newIdx && this.vlcProcess === undefined) {
-          this.spawnVlc(current.music);
-        }
-      });
+      return;
     }
+
+    const oldIdx = this.currentMusicIdx;
+    current.downloadPromise!.then(() => {
+      const newIdx = this.currentMusicIdx;
+      logger.debug(`oldIdx: ${oldIdx}, newIdx: ${newIdx}, vlcProcess: ${this.vlcProcess}`);
+
+      if (oldIdx !== newIdx) {
+        logger.debug(`at end of download, ${current.music.title} is no longer the current music`);
+        return;
+      }
+
+      if (this.vlcProcess !== undefined) {
+        logger.debug(`at end of download, ${current.music.title} is already playing (because of multiple 'then' attached to the promise)`);
+        return;
+      }
+
+      this.spawnVlc(current.music);
+    });
   }
 
   public stop() {
