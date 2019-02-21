@@ -80,21 +80,21 @@ export class MusicController implements RegistrableController {
 
   private async playMusic(ctx: Koa.Context) {
     await this.musicService.playMusic();
-    ctx.status = 202;
+    ctx.status = 204;
   }
 
   private async stopMusic(ctx: Koa.Context) {
     await this.musicService.stopMusic();
-    ctx.status = 202;
+    ctx.status = 204;
   }
 
   private async nextMusic(ctx: Koa.Context) {
     await this.musicService.nextMusic();
-    ctx.status = 202;
+    ctx.status = 204;
   }
 
   private async previousMusic(ctx: Koa.Context) {
     await this.musicService.previousMusic();
-    ctx.status = 202;
+    ctx.status = 204;
   }
 }
