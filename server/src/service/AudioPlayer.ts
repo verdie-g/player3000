@@ -69,22 +69,25 @@ export class AudioPlayerImpl implements AudioPlayer {
     const current = this.queue[this.currentMusicIdx];
 
     if (current.ready) {
+      logger.debug(`${current.music.title} is ready`);
       this.spawnVlc(current.music);
       return;
     }
 
+    if (current.playThen) {
+      logger.debug(`${current.music.title} already has a callback but is not ready. Waiting for the callback to fire`);
+      return;
+    }
+
+    logger.debug(`${current.music.title} is not ready. Attaching play callback`);
+    current.playThen = true;
     const oldIdx = this.currentMusicIdx;
     current.downloadPromise!.then(() => {
       const newIdx = this.currentMusicIdx;
-      logger.debug(`oldIdx: ${oldIdx}, newIdx: ${newIdx}, vlcProcess: ${this.vlcProcess}`);
+      logger.debug(`oldIdx: ${oldIdx}, newIdx: ${newIdx}`);
 
       if (oldIdx !== newIdx) {
-        logger.debug(`at end of download, ${current.music.title} is no longer the current music`);
-        return;
-      }
-
-      if (this.vlcProcess !== undefined) {
-        logger.debug(`at end of download, ${current.music.title} is already playing (because of multiple 'then' attached to the promise)`);
+        logger.debug(`${current.music.title} is no longer the current music at download end`);
         return;
       }
 
