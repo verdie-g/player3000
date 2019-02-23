@@ -3,13 +3,12 @@ import * as path from 'path';
 import { injectable } from 'inversify';
 import { ChildProcess, spawn } from 'child_process';
 import { Music } from '../model/Music';
-import { PlayerQueueItem } from '../model/PlayerQueueItem';
-import { Playlist } from '../model/Playlist';
+import { Playlist, PlaylistQueueItem } from '../model/Playlist';
 import { logger } from '../util/Logger';
 
 export interface AudioPlayer {
   getPlaylist(): Playlist;
-  enqueue(music: Music, downloadPromise?: Promise<void>): void;
+  enqueue(music: Music, downloadPromise?: Promise<void>): Music;
   play(): void;
   stop(): void;
   next(): void;
@@ -20,12 +19,14 @@ const MUSIC_FOLDER: string = config.get('musicFolderPath');
 
 @injectable()
 export class AudioPlayerImpl implements AudioPlayer {
-  private queue: PlayerQueueItem[];
+  private track: number;
+  private queue: PlaylistQueueItem[];
   private currentMusicIdx: number;
   private playing: boolean;          // player is waiting for a download to start or is playing
   private vlcProcess?: ChildProcess; // if !== undefined => playing = true and a music is necessarily playing
 
   constructor() {
+    this.track = 1;
     this.queue = [];
     this.currentMusicIdx = -1;
     this.vlcProcess = undefined;
@@ -39,8 +40,11 @@ export class AudioPlayerImpl implements AudioPlayer {
     };
   }
 
-  public enqueue(music: Music, downloadPromise?: Promise<void>) {
-    const item = new PlayerQueueItem(music, downloadPromise);
+  public enqueue(music: Music, downloadPromise?: Promise<void>): Music {
+    music.track = this.track;
+    this.track += 1;
+
+    const item = new PlaylistQueueItem(music, downloadPromise);
     this.queue.push(item);
 
     if (!item.ready) {
@@ -50,6 +54,8 @@ export class AudioPlayerImpl implements AudioPlayer {
     if (!this.playing) {
       this.next();
     }
+
+    return music;
   }
 
   public play() {

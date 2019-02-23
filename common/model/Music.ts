@@ -12,4 +12,5 @@ export interface Music {
   thumbUrl: string;
   downloadState: MusicDownloadState;
   id?: number;
+  track?: number;
 }

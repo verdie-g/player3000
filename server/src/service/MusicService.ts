@@ -58,7 +58,7 @@ export class MusicServiceImpl implements MusicService {
   public async enqueueMusic(videoId: string): Promise<ServiceResult<Music>> {
     let music = await this.musicRepository.getByVideoId(videoId);
     if (music) {
-      this.audioPlayer.enqueue(music);
+      music = this.audioPlayer.enqueue(music);
       return ServiceResult.ok(ServiceCode.ACCEPTED, music);
     }
 
