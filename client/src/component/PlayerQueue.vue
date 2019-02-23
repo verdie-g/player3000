@@ -20,6 +20,10 @@ export default class PlayerQueue extends Vue {
   get queue() {
     return playerModule.playlist.queue;
   }
+
+  created() {
+    playerModule.getPlaylist();
+  }
 }
 </script>
 
