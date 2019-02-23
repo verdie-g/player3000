@@ -9,6 +9,7 @@
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import debounce from 'debounce';
 
+import { isWhitespace } from '../util/StringUtil';
 import musicModule from '../store/MusicModule';
 
 @Component({
@@ -23,6 +24,10 @@ export default class SearchBar extends Vue {
   }
 
   onChange(e: any) {
+    if (isWhitespace(this.query)) {
+      return;
+    }
+
     this.searchDebounce(this.query);
   }
 }
