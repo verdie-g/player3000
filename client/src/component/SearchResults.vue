@@ -1,6 +1,6 @@
 <template>
   <ul>
-    <li v-for="music in musics" @click="onSelect(music)">
+    <li v-for="music in musics" :key="music.videoId" @click="onSelect(music)">
       {{music.title}}
     </li>
   </ul>
