@@ -1,7 +1,7 @@
 <template>
   <div>
-    <SearchBar @searchEnd="onSearchEnd" />
-    <SearchResults :musics="musics" @select="(m) => $emit('select', m)" />
+    <SearchBar />
+    <SearchResults />
   </div>
 </template>
 
@@ -11,8 +11,6 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 import SearchBar from './SearchBar.vue';
 import SearchResults from './SearchResults.vue';
 
-import { Music } from '../model/Music';
-
 @Component({
   components: {
     SearchBar,
@@ -20,11 +18,6 @@ import { Music } from '../model/Music';
   },
 })
 export default class Search extends Vue {
-  musics: Music[] = [];
-
-  onSearchEnd(musics: Music[]) {
-    this.musics = musics;
-  }
 }
 </script>
 

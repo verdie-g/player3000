@@ -9,16 +9,20 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 
+import musicModule from '../store/MusicModule';
+import playerModule from '../store/PlayerModule';
 import { Music } from '../model/Music';
 
 @Component({
   components: {},
 })
 export default class SearchResults extends Vue {
-  @Prop(Array) musics!: Music[];
+  get musics() {
+    return musicModule.searchResults;
+  }
 
   onSelect(music: Music) {
-    this.$emit('select', music);
+    playerModule.enqueueMusic(music);
   }
 }
 </script>
