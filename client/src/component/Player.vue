@@ -18,9 +18,9 @@ import 'vue-awesome/icons/stop';
 import 'vue-awesome/icons/play';
 import 'vue-awesome/icons/forward';
 
-import { Music, MusicDownloadState } from '../model/Music';
+import playerModule from '../store/PlayerModule';
 import playlistService from '../service/PlaylistService';
-
+import { Music, MusicDownloadState } from '../model/Music';
 
 const emptyMusic: Music = {
   videoId: '',
@@ -35,7 +35,9 @@ const emptyMusic: Music = {
   components: {},
 })
 export default class Player extends Vue {
-  @Prop({ default: () => emptyMusic }) music!: Music;
+  get music() {
+    return playerModule.playingMusic || emptyMusic;
+  }
 
   previous() {
     playlistService.previousMusic();

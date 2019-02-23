@@ -11,6 +11,10 @@ class PlayerModule extends VuexModule {
   playlist: Playlist = { queue: [], currentIdx: -1 };
   playlistItemProgression: { [track: number]: number } = {};
 
+  get playingMusic() {
+    return this.playlist.queue[this.playlist.currentIdx];
+  }
+
   @Mutation
   addToQueue(item: Music) {
     this.playlist.queue.push(item);
