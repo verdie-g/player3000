@@ -3,6 +3,7 @@ const TYPES = {
   Controller: Symbol('Controller'),
   MusicRepository: Symbol('MusicRepository'),
   MusicService: Symbol('MusicService'),
+  SSEService: Symbol('SSEService'),
   YoutubeRepository: Symbol('YoutubeRepository'),
 };
 

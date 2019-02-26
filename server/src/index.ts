@@ -10,6 +10,8 @@ import { RegistrableController } from './controller/RegisterableController';
 import { Route } from './middleware/Route';
 import { validate } from './middleware/Validator';
 
+const PORT = config.get('port');
+
 const app = new Koa();
 const router = new Router();
 
@@ -34,8 +36,6 @@ app.on('error', (err, _) => {
   logger.error(`${err.message}: ${err.stack}`);
 });
 
-const port = config.get('port');
-
-app.listen(port, () => {
-  logger.info(`Listening on port ${port}`);
+app.listen(PORT, () => {
+  logger.info(`Listening on port ${PORT}`);
 });
