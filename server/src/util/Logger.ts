@@ -5,6 +5,11 @@ export const logger: winston.Logger = winston.createLogger({
   exitOnError: false,
   level: config.get('logLevel'),
   transports: [
-    new winston.transports.Console(),
+    new winston.transports.Console({
+      format: winston.format.combine(
+        winston.format.colorize(),
+        winston.format.simple(),
+      ),
+    }),
   ],
 });
