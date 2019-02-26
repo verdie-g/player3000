@@ -1,8 +1,6 @@
 import { IncomingMessage, ServerResponse } from 'http';
 import { injectable } from 'inversify';
 
-import { logger } from '../util/Logger';
-
 export interface SSEService {
   addClient(req: IncomingMessage, res: ServerResponse): void;
   removeClient(client: Client): void;
