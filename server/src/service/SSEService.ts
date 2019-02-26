@@ -52,7 +52,7 @@ export class SSEServiceImpl implements SSEService {
       msg += `data: ${JSON.stringify(data)}\n`;
     }
 
-    msg += '\n\n';
+    msg += '\n';
 
     logger.debug(`pushing ${msg} to clients`);
     this.clients.forEach((client) => {
