@@ -1,13 +1,16 @@
 import * as ytdl from 'ytdl-core';
 import { injectable, inject } from 'inversify';
+
 import TYPES from '../types';
 import { AudioPlayer } from './AudioPlayer';
 import { Music, MusicDownloadState } from '../model/Music';
 import { MusicRepository } from '../repository/MusicRepository';
 import { Playlist } from '../model/Playlist';
+import { SSEService } from '../service/SSEService';
 import { ServiceResult, ServiceCode } from '../model/ServiceResult';
 import { YoutubeRepository, YouTubeResponse, YouTubeSearchResults } from '../repository/YoutubeRepository';
 import { getOr } from '../util/ObjectUtil';
+import { logger } from '../util/Logger';
 
 export interface MusicService {
   searchMusic(query: string): Promise<Music[]>;
@@ -21,6 +24,9 @@ export interface MusicService {
 
 @injectable()
 export class MusicServiceImpl implements MusicService {
+  @inject(TYPES.SSEService)
+  private sseService!: SSEService;
+
   @inject(TYPES.AudioPlayer)
   private audioPlayer!: AudioPlayer;
 
@@ -103,8 +109,22 @@ export class MusicServiceImpl implements MusicService {
   }
 
   private async downloadMusic(music: Music, info: ytdl.videoInfo): Promise<void> {
-    await this.youtubeRepository.downloadMusic(info);
+    await this.youtubeRepository.downloadMusic(info, this.onDownloadProgress(music));
     music.downloadState = MusicDownloadState.DOWNLOADED;
     await this.musicRepository.setDownloadState(music.id!, MusicDownloadState.DOWNLOADED);
+  }
+
+  private onDownloadProgress(music: Music): (videoInfo: ytdl.videoInfo, percent: number) => void {
+    const interval = 10;
+    let lastStep = 0;
+    return (videoInfo, percent) => {
+      if (percent < lastStep) {
+        return;
+      }
+
+      lastStep = percent + interval - (percent % 10);
+      logger.info(`${videoInfo.title}: downloading ${percent}%`);
+      this.sseService.send('downloadProgress', { id: music.id, progress: percent });
+    };
   }
 }

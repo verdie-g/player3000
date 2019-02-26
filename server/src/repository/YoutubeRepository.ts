@@ -16,7 +16,7 @@ export interface YouTubeResponse {
 export interface YoutubeRepository {
   search(term: string): Promise<YouTubeResponse>;
   getInfo(videoId: string): Promise<ytdl.videoInfo>;
-  downloadMusic(videoInfo: ytdl.videoInfo): Promise<ytdl.videoInfo>;
+  downloadMusic(videoInfo: ytdl.videoInfo, onProgress: (videoInfo: ytdl.videoInfo, percent: number) => void): Promise<ytdl.videoInfo>;
 }
 
 const YOUTUBE_API_KEY: string = config.get('youtubeApiKey');
@@ -41,20 +41,20 @@ export class YoutubeRepositoryImpl implements YoutubeRepository  {
     return ytdl.getInfo(videoId);
   }
 
-  public downloadMusic(videoInfo: ytdl.videoInfo): Promise<ytdl.videoInfo> {
+  public downloadMusic(videoInfo: ytdl.videoInfo, onProgress: (videoInfo: ytdl.videoInfo, percent: number) => void): Promise<ytdl.videoInfo> {
     return new Promise((resolve, _) => {
       const stream = ytdl.downloadFromInfo(videoInfo, {
         quality: 'highestaudio',
         filter: 'audioonly',
       })
-      .on('progress', (_: number, downloaded: number, total: number) => {
-        const percent = Number(100 * downloaded / total).toFixed(2);
-        logger.info(`${videoInfo.title}: downloading ${percent}%...`);
-      })
-      .on('end', () => {
-        logger.info(`${videoInfo.title}: end download`);
-        resolve(videoInfo);
-      });
+        .on('progress', (_: number, downloaded: number, total: number) => {
+          const percent = Math.floor(100 * downloaded / total);
+          onProgress(videoInfo, percent);
+        })
+        .on('end', () => {
+          logger.info(`${videoInfo.title}: end download`);
+          resolve(videoInfo);
+        });
 
       const musicPath = path.join(MUSIC_FOLDER, videoInfo.title);
       logger.info(`${videoInfo.title}: start downloading to ${musicPath}`);
