@@ -1,6 +1,8 @@
 import { IncomingMessage, ServerResponse } from 'http';
 import { injectable } from 'inversify';
 
+import { logger } from '../util/Logger';
+
 export interface SSEService {
   addClient(req: IncomingMessage, res: ServerResponse): void;
   removeClient(client: Client): void;
@@ -52,6 +54,7 @@ export class SSEServiceImpl implements SSEService {
 
     msg += '\n\n';
 
+    logger.debug(`pushing ${msg} to clients`);
     this.clients.forEach((client) => {
       client.write(msg);
     });
