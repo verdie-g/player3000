@@ -14,10 +14,6 @@ import serverEvents from './service/ServerEventsService';
   },
 })
 export default class App extends Vue {
-  created() {
-    serverEvents.open();
-  }
-
   destroy() {
     serverEvents.close();
   }
