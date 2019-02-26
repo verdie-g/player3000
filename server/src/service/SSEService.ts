@@ -25,6 +25,7 @@ export class SSEServiceImpl implements SSEService {
       'Cache-Control': 'no-cache',
       Connection: 'keep-alive',
     });
+    res.write('ok\n\n');
 
     this.clients.push(res);
   }
