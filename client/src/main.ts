@@ -1,10 +1,11 @@
-import Icon from 'vue-awesome/components/Icon.vue';
+import Buefy from 'buefy';
 import Vue from 'vue';
+import 'buefy/dist/buefy.css';
 
 import App from './App.vue';
 import store from './store/index';
 
-Vue.component('v-icon', Icon);
+Vue.use(Buefy);
 
 Vue.config.productionTip = false;
 
