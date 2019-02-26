@@ -1,5 +1,5 @@
 <template>
-  <div v-if="music">
+  <div v-if="music" class="container">
     <img :src="music.thumbUrl" width=64 />
     <span>{{music.title}}</span>
     <ul>

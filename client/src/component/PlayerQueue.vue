@@ -1,5 +1,5 @@
 <template>
-  <ul>
+  <ul class="container">
     <li v-for="music in queue" :key="music.track">
       {{music.title}}
       <span v-if="music.track === undefined"> (loading...)</span>

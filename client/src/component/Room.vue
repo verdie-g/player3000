@@ -1,8 +1,12 @@
 <template>
   <div>
-    <Search />
-    <Player />
-    <PlayerQueue />
+    <div class="section">
+      <Search />
+    </div>
+    <div class="section">
+      <Player />
+      <PlayerQueue />
+    </div>
   </div>
 </template>
 
