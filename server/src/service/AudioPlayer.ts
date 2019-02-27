@@ -37,6 +37,7 @@ export class AudioPlayerImpl implements AudioPlayer {
     return {
       queue: this.queue.map(item => item.music),
       currentIdx: this.currentMusicIdx,
+      playing: this.playing,
     };
   }
 
