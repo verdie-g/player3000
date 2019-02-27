@@ -1,40 +1,38 @@
 import * as config from 'config';
 import * as fs from 'fs';
 import * as path from 'path';
-import * as youtubeSearch from 'youtube-search';
 import * as ytdl from 'ytdl-core';
+import fetch from 'node-fetch';
 import { injectable } from 'inversify';
+
+import { YoutubeSearchOptions, YoutubeSearchResponse } from '../model/Youtube';
 import { logger } from '../util/Logger';
-
-export { YouTubeThumbnail, YouTubeSearchResultThumbnails, YouTubeSearchResults, YouTubeSearchPageResults } from 'youtube-search';
-
-export interface YouTubeResponse {
-  results: youtubeSearch.YouTubeSearchResults[];
-  pageInfo: youtubeSearch.YouTubeSearchPageResults;
-}
+import { uriEncode } from '../util/ObjectUtil';
 
 export interface YoutubeRepository {
-  search(term: string): Promise<YouTubeResponse>;
+  search(term: string): Promise<YoutubeSearchResponse>;
   getInfo(videoId: string): Promise<ytdl.videoInfo>;
   downloadMusic(videoInfo: ytdl.videoInfo, onProgress: (videoInfo: ytdl.videoInfo, percent: number) => void): Promise<ytdl.videoInfo>;
 }
 
 const YOUTUBE_API_KEY: string = config.get('youtubeApiKey');
+const YOUTUBE_SEARCH_URL = 'https://www.googleapis.com/youtube/v3/search';
 const MUSIC_FOLDER: string = config.get('musicFolderPath');
 
-const searchOptions: youtubeSearch.YouTubeSearchOptions = {
+const searchOptions: YoutubeSearchOptions = {
   part: 'snippet',
-  maxResults: 5,
+  maxResults: 10,
   // topicId: '/m/04rlf' // Music
   type: 'video',
   videoCategoryId: '10', // Music
-  key: YOUTUBE_API_KEY,
 };
 
 @injectable()
 export class YoutubeRepositoryImpl implements YoutubeRepository  {
-  public search(term: string): Promise<YouTubeResponse> {
-    return youtubeSearch(term, searchOptions);
+  public async search(term: string): Promise<YoutubeSearchResponse> {
+    searchOptions.q = term;
+    const res = await fetch(`${YOUTUBE_SEARCH_URL}?key=${YOUTUBE_API_KEY}&${uriEncode(searchOptions)}`);
+    return res.json();
   }
 
   public getInfo(videoId: string): Promise<ytdl.videoInfo> {

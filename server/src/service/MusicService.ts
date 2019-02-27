@@ -8,7 +8,8 @@ import { MusicRepository } from '../repository/MusicRepository';
 import { Playlist } from '../model/Playlist';
 import { SSEService } from '../service/SSEService';
 import { ServiceResult, ServiceCode } from '../model/ServiceResult';
-import { YoutubeRepository, YouTubeResponse, YouTubeSearchResults } from '../repository/YoutubeRepository';
+import { YoutubeRepository } from '../repository/YoutubeRepository';
+import { YoutubeSearchResponse, YoutubeItem } from '../model/Youtube';
 import { getOr } from '../util/ObjectUtil';
 import { logger } from '../util/Logger';
 
@@ -37,8 +38,8 @@ export class MusicServiceImpl implements MusicService {
   private musicRepository!: MusicRepository;
 
   public async searchMusic(query: string): Promise<Music[]> {
-    const ytRes: YouTubeResponse = await this.youtubeRepository.search(query);
-    const videoIds = ytRes.results.map((result: YouTubeSearchResults) => result.id);
+    const ytRes: YoutubeSearchResponse = await this.youtubeRepository.search(query);
+    const videoIds = ytRes.items.map((result: YoutubeItem) => result.id.videoId);
 
     const downloadStatesByVideoId =
       (await this.musicRepository.getDownloadStates(videoIds))
@@ -47,13 +48,13 @@ export class MusicServiceImpl implements MusicService {
         return acc;
       }, {});
 
-    return ytRes.results.map((result: YouTubeSearchResults) => ({
-      videoId: result.id,
-      title: result.title,
-      description: result.description,
-      duration: 0, // youtube-search module doesn't expose all youtube api fields
-      thumbUrl: result.thumbnails.default!.url,
-      downloadState: getOr(downloadStatesByVideoId, result.id, MusicDownloadState.NOT_DOWNLOADED),
+    return ytRes.items.map((item: YoutubeItem) => ({
+      videoId: item.id.videoId,
+      title: item.snippet.title,
+      description: item.snippet.description,
+      duration: 0, // another yt api call is needed to get duration
+      thumbUrl: item.snippet.thumbnails.default!.url,
+      downloadState: getOr(downloadStatesByVideoId, item.id.videoId, MusicDownloadState.NOT_DOWNLOADED),
     }));
   }
 

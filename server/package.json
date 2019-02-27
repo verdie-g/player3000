@@ -23,9 +23,9 @@
     "koa": "^2.6.2",
     "koa-bodyparser": "^4.2.1",
     "koa-tree-router": "^0.4.3",
+    "node-fetch": "^2.3.0",
     "pg": "^7.8.0",
     "winston": "^3.1.0",
-    "youtube-search": "^1.1.4",
     "ytdl-core": "^0.29.1"
   },
   "devDependencies": {
@@ -34,6 +34,7 @@
     "@types/koa": "^2.0.47",
     "@types/koa-bodyparser": "^4.2.1",
     "@types/koa__cors": "^2.2.3",
+    "@types/node-fetch": "^2.1.6",
     "@types/winston": "^2.4.4",
     "nodemon": "^1.18.7",
     "ts-node": "^7.0.1",

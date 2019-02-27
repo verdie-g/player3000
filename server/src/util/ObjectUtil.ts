@@ -11,3 +11,11 @@ export function copyValues(dst: any, src: any): any {
   });
   return dst;
 }
+
+export function uriEncode(obj: any) {
+  const str: string[] = [];
+  Object.keys(obj).forEach((key) => {
+    str.push(`${encodeURIComponent(key)}=${encodeURIComponent(obj[key])}`);
+  });
+  return str.join('&');
+}
