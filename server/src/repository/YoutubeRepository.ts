@@ -22,7 +22,7 @@ const MUSIC_FOLDER: string = config.get('musicFolderPath');
 const searchOptions: YoutubeSearchOptions = {
   part: 'snippet',
   maxResults: 10,
-  // topicId: '/m/04rlf' // Music
+  topicId: '/m/04rlf', // Music
   type: 'video',
   videoCategoryId: '10', // Music
 };
