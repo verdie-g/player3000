@@ -130,7 +130,7 @@ export class MusicServiceImpl implements MusicService {
 
       lastStep = percent + interval - (percent % interval);
       logger.info(`${videoInfo.title}: downloading ${percent}%`);
-      this.sseService.send('downloadProgress', { id: music.id, progress: percent });
+      this.sseService.send('downloadProgress', { musicId: music.id, progress: percent });
     };
   }
 }

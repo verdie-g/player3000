@@ -9,8 +9,14 @@ export class ServerEventsService {
     this.eventSource = new EventSource(URL);
   }
 
-  on(event: string, cb: (data: any) => void) {
+  on(event: string, cb: (data: any) => void): this {
     this.eventSource.addEventListener(event, (e: any) => { cb(JSON.parse(e.data)); });
+    return this;
+  }
+
+  off(event: string, cb: (data: any) => void): this {
+    this.eventSource.removeEventListener(event, cb);
+    return this;
   }
 
   close() {

@@ -18,6 +18,12 @@
             <span class="music-title">{{ props.row.title }}</span>
           </div>
         </b-table-column>
+
+        <b-table-column label="">
+          <span v-if="musicDownloadProgression[props.row.id] !== undefined && musicDownloadProgression[props.row.id] !== 100">
+            {{ musicDownloadProgression[props.row.id] }}%
+          </span>
+        </b-table-column>
       </template>
     </b-table>
   </div>
@@ -27,6 +33,8 @@
 import { Component, Prop, Vue } from 'vue-property-decorator';
 
 import playerModule from '../store/PlayerModule';
+import serverEvents from '../service/ServerEventsService';
+import { DownloadProgressionMessage } from '../model/Message';
 import { Music, MusicDownloadState } from '../model/Music';
 
 @Component({
@@ -45,8 +53,21 @@ export default class PlayerQueue extends Vue {
     return playerModule.playingMusic;
   }
 
-  created() {
+  get musicDownloadProgression() {
+    return playerModule.musicDownloadProgression;
+  }
+
+  mounted() {
     playerModule.getPlaylist();
+    serverEvents.on('downloadProgress', this.onDownloadProgress);
+  }
+
+  destroyed() {
+    serverEvents.off('downloadProgress', this.onDownloadProgress);
+  }
+
+  onDownloadProgress(progression: DownloadProgressionMessage) {
+    playerModule.setMusicDownloadProgression(progression);
   }
 }
 </script>

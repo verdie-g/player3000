@@ -10,7 +10,7 @@ import { Playlist } from '../model/Playlist';
 class PlayerModule extends VuexModule {
   playlist: Playlist = { queue: [], currentIdx: -1, playing: false };
   playlistLoading: boolean = false;
-  playlistItemProgression: { [track: number]: number } = {};
+  musicDownloadProgression: { [musicId: number]: number } = {};
 
   get playingMusic() {
     return this.playlist.queue[this.playlist.currentIdx];
@@ -28,11 +28,6 @@ class PlayerModule extends VuexModule {
   }
 
   @Mutation
-  setPlaylistItemDownloadProgress(track: number, downloadProgress: number) {
-    this.playlistItemProgression[track] = downloadProgress;
-  }
-
-  @Mutation
   updatePlaylist(playlist: Playlist) {
     this.playlist = playlist;
   }
@@ -40,6 +35,11 @@ class PlayerModule extends VuexModule {
   @Mutation
   setPlaylistLoading(loading: boolean) {
     this.playlistLoading = loading;
+  }
+
+  @Mutation
+  setMusicDownloadProgression({ musicId, progress }: { musicId: number; progress: number; }) {
+    Vue.set(this.musicDownloadProgression, musicId, progress);
   }
 
   @Action({ commit: 'updatePlaylist' })
@@ -55,7 +55,7 @@ class PlayerModule extends VuexModule {
     this.addToQueue(music);
     const created = await playlistService.enqueueMusic(music.videoId);
     this.replaceMusic({ old: music, n: created });
-    this.setPlaylistItemDownloadProgress(created.track!, 0);
+    this.setMusicDownloadProgression({ musicId: created.id!, progress: 0 });
   }
 }
 
