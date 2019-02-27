@@ -1,13 +1,15 @@
 <template>
   <div class="container">
-    <img :src="music.thumbHighUrl" />
-    <span>{{music.title}}</span>
-    <ul>
-      <li @click="previous"><b-icon icon="skip-previous"></b-icon></li>
-      <li @click="stop"><b-icon icon="stop" /></li>
-      <li @click="play"><b-icon icon="play" /></li>
-      <li @click="next"><b-icon icon="skip-next" /></li>
-    </ul>
+    <div class="player">
+      <img :src="music.thumbHighUrl" class="player-img" />
+      <div class="player-title is-size-4">{{music.title}}</div>
+      <ul class="player-controls is-size-5">
+        <li @click="previous"><b-icon icon="skip-previous" size="is-large"></b-icon></li>
+        <li v-if="playing" @click="stop"><b-icon icon="stop" size="is-large" /></li>
+        <li v-else @click="play"><b-icon icon="play" size="is-large" /></li>
+        <li @click="next"><b-icon icon="skip-next" size="is-large" /></li>
+      </ul>
+    </div>
   </div>
 </template>
 
@@ -20,7 +22,7 @@ import { Music, MusicDownloadState } from '../model/Music';
 
 const emptyMusic: Music = {
   videoId: '',
-  title: '',
+  title: 'no music',
   description: '',
   duration: 0,
   downloadState: MusicDownloadState.NOT_DOWNLOADED,
@@ -35,6 +37,10 @@ const emptyMusic: Music = {
 export default class Player extends Vue {
   get music() {
     return playerModule.playingMusic || emptyMusic;
+  }
+
+  get playing() {
+    return this.music !== emptyMusic;
   }
 
   previous() {
@@ -56,4 +62,25 @@ export default class Player extends Vue {
 </script>
 
 <style scoped>
+.container {
+  text-align: center;
+}
+
+.player {
+  display: inline-block;
+}
+
+.player-img {
+  width: 336px;
+  height: 188px;
+  background-color: #d8d8d8;
+}
+
+.player-title {
+  text-align: center;
+}
+
+.player-controls li {
+  display: inline-block;
+}
 </style>
