@@ -53,7 +53,9 @@ export class MusicServiceImpl implements MusicService {
       title: item.snippet.title,
       description: item.snippet.description,
       duration: 0, // another yt api call is needed to get duration
-      thumbUrl: item.snippet.thumbnails.default!.url,
+      thumbSmallUrl: item.snippet.thumbnails.default.url,
+      thumbMediumUrl: item.snippet.thumbnails.medium.url,
+      thumbHighUrl: item.snippet.thumbnails.high.url,
       downloadState: getOr(downloadStatesByVideoId, item.id.videoId, MusicDownloadState.NOT_DOWNLOADED),
     }));
   }
@@ -99,12 +101,15 @@ export class MusicServiceImpl implements MusicService {
   }
 
   private createMusicFromVideoInfo(info: ytdl.videoInfo): Promise<Music> {
+    console.log(JSON.stringify(info.player_response.videoDetails.thumbnail));
     return this.musicRepository.create({
       videoId: info.video_id,
       title: info.title,
       description: info.description,
       duration: parseInt(info.length_seconds, 10),
-      thumbUrl: info.thumbnail_url,
+      thumbSmallUrl: info.player_response.videoDetails.thumbnail.thumbnails[0].url,
+      thumbMediumUrl: info.player_response.videoDetails.thumbnail.thumbnails[1].url,
+      thumbHighUrl: info.player_response.videoDetails.thumbnail.thumbnails[3].url,
       downloadState: MusicDownloadState.DOWNLOADING,
     });
   }

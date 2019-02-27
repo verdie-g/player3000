@@ -14,7 +14,7 @@
       <template slot-scope="props">
         <div class="media">
           <div class="media-left">
-            <img width="30" :src="props.option.thumbUrl">
+            <img width="30" :src="props.option.thumbSmallUrl">
           </div>
           <div class="media-content">{{ props.option.title }}</div>
         </div>
@@ -35,7 +35,7 @@ import { isWhitespace } from '../util/StringUtil';
 @Component({
   components: {},
 })
-export default class SearchBar extends Vue {
+export default class Search extends Vue {
   query: string = '';
   searchDebounce = debounce((query: string) => musicModule.searchMusic(query), 400);
 

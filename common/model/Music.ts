@@ -9,7 +9,9 @@ export interface Music {
   title: string;
   description: string;
   duration: number;
-  thumbUrl: string;
+  thumbSmallUrl: string;  // 168x94
+  thumbMediumUrl: string; // 246x138
+  thumbHighUrl: string;   // 336x188
   downloadState: MusicDownloadState;
   id?: number;
   track?: number;

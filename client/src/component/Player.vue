@@ -1,6 +1,6 @@
 <template>
-  <div v-if="music" class="container">
-    <img :src="music.thumbUrl" width=64 />
+  <div class="container">
+    <img :src="music.thumbHighUrl" />
     <span>{{music.title}}</span>
     <ul>
       <li @click="previous"><b-icon icon="skip-previous"></b-icon></li>
@@ -24,7 +24,9 @@ const emptyMusic: Music = {
   description: '',
   duration: 0,
   downloadState: MusicDownloadState.NOT_DOWNLOADED,
-  thumbUrl: 'https://play-music.gstatic.com/fe/729694752b42e97e27f106c7aada2cdf/default_album.svg',
+  thumbSmallUrl: 'https://play-music.gstatic.com/fe/729694752b42e97e27f106c7aada2cdf/default_album.svg',
+  thumbMediumUrl: 'https://play-music.gstatic.com/fe/729694752b42e97e27f106c7aada2cdf/default_album.svg',
+  thumbHighUrl: 'https://play-music.gstatic.com/fe/729694752b42e97e27f106c7aada2cdf/default_album.svg',
 };
 
 @Component({
