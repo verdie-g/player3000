@@ -40,7 +40,7 @@ export default class Player extends Vue {
   }
 
   get playing() {
-    return this.music !== emptyMusic;
+    return playerModule.playlist.playing;
   }
 
   previous() {

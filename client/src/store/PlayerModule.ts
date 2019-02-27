@@ -8,7 +8,7 @@ import { Playlist } from '../model/Playlist';
 
 @Module({ store, dynamic: true, name: 'player' })
 class PlayerModule extends VuexModule {
-  playlist: Playlist = { queue: [], currentIdx: -1 };
+  playlist: Playlist = { queue: [], currentIdx: -1, playing: false };
   playlistLoading: boolean = false;
   playlistItemProgression: { [track: number]: number } = {};
 
