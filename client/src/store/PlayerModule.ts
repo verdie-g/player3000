@@ -9,6 +9,7 @@ import { Playlist } from '../model/Playlist';
 @Module({ store, dynamic: true, name: 'player' })
 class PlayerModule extends VuexModule {
   playlist: Playlist = { queue: [], currentIdx: -1 };
+  playlistLoading: boolean = false;
   playlistItemProgression: { [track: number]: number } = {};
 
   get playingMusic() {
@@ -36,9 +37,16 @@ class PlayerModule extends VuexModule {
     this.playlist = playlist;
   }
 
+  @Mutation
+  setPlaylistLoading(loading: boolean) {
+    this.playlistLoading = loading;
+  }
+
   @Action({ commit: 'updatePlaylist' })
   async getPlaylist() {
+    this.setPlaylistLoading(true);
     const playlist = await playlistService.getPlaylist();
+    this.setPlaylistLoading(false);
     return playlist;
   }
 

@@ -1,10 +1,26 @@
 <template>
-  <ul class="container">
-    <li v-for="music in queue" :key="music.track">
-      {{music.title}}
-      <span v-if="music.track === undefined"> (loading...)</span>
-    </li>
-  </ul>
+  <div class="container">
+    <b-table
+      :data="queue"
+      striped
+      :loading="loading"
+      :selected="playingMusic">
+
+      <template slot-scope="props">
+        <b-table-column field="track" label="#" width="50" numeric>
+          <span v-if="props.row.track === undefined">loading</span>
+          <span v-else>{{ props.row.track }}</span>
+        </b-table-column>
+
+        <b-table-column field="title" label="Title">
+          <div class="music-title">
+            <img :src="props.row.thumbSmallUrl" class="music-image">
+            <span class="music-title">{{ props.row.title }}</span>
+          </div>
+        </b-table-column>
+      </template>
+    </b-table>
+  </div>
 </template>
 
 <script lang="ts">
@@ -21,6 +37,14 @@ export default class PlayerQueue extends Vue {
     return playerModule.playlist.queue;
   }
 
+  get loading() {
+    return playerModule.playlistLoading;
+  }
+
+  get playingMusic() {
+    return playerModule.playingMusic;
+  }
+
   created() {
     playerModule.getPlaylist();
   }
@@ -28,4 +52,13 @@ export default class PlayerQueue extends Vue {
 </script>
 
 <style scoped>
+.music-title {
+  display: flex;
+  align-items: center;
+}
+
+.music-image {
+  height: 31px;
+  margin-right: 12px;
+}
 </style>
