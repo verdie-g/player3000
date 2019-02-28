@@ -1,10 +1,12 @@
 import * as config from 'config';
 import * as path from 'path';
-import { injectable } from 'inversify';
+import { injectable, inject } from 'inversify';
 import { ChildProcess, spawn } from 'child_process';
 
+import TYPES from '../types';
 import { Music } from '../model/Music';
 import { Playlist, PlaylistQueueItem } from '../model/Playlist';
+import { SSEService } from '../service/SSEService';
 import { logger } from '../util/Logger';
 
 const MUSIC_FOLDER: string = config.get('musicFolderPath');
@@ -20,6 +22,9 @@ export interface AudioPlayer {
 
 @injectable()
 export class AudioPlayerImpl implements AudioPlayer {
+  @inject(TYPES.SSEService)
+  private sseService!: SSEService;
+
   private track: number;
   private queue: PlaylistQueueItem[];
   private currentMusicIdx: number;
@@ -32,6 +37,10 @@ export class AudioPlayerImpl implements AudioPlayer {
     this.currentMusicIdx = -1;
     this.vlcProcess = undefined;
     this.playing = false;
+  }
+
+  get current() {
+    return this.queue[this.currentMusicIdx];
   }
 
   public getPlaylist(): Playlist {
@@ -50,6 +59,7 @@ export class AudioPlayerImpl implements AudioPlayer {
 
     const item = new PlaylistQueueItem(music, downloadPromise);
     this.queue.push(item);
+    this.sseService.send('enqueue', { music });
 
     if (!item.ready) {
       item.downloadPromise!.then(() => { item.ready = true; });
@@ -77,6 +87,7 @@ export class AudioPlayerImpl implements AudioPlayer {
       return;
     }
 
+    this.sseService.send('play', { track: this.current.music.track });
     this.playing = true;
     this.playCurrent();
   }
@@ -89,6 +100,7 @@ export class AudioPlayerImpl implements AudioPlayer {
       return;
     }
 
+    this.sseService.send('stop', { track: this.current.music.track });
     this.stopVlc();
     this.playing = false;
   }
@@ -102,6 +114,7 @@ export class AudioPlayerImpl implements AudioPlayer {
     }
 
     this.currentMusicIdx += 1;
+    this.sseService.send('next', { track: this.current.music.track });
     if (!this.playing) {
       logger.debug('player: not playing');
       return;
@@ -120,6 +133,7 @@ export class AudioPlayerImpl implements AudioPlayer {
     }
 
     this.currentMusicIdx -= 1;
+    this.sseService.send('previous', { track: this.current.music.track });
     if (!this.playing) {
       logger.debug('player: not playing');
       return;
@@ -137,7 +151,7 @@ export class AudioPlayerImpl implements AudioPlayer {
       return;
     }
 
-    const current = this.queue[this.currentMusicIdx];
+    const current = this.current;
 
     if (current.ready) {
       logger.debug(`player: ${current.music.title} is ready`);
