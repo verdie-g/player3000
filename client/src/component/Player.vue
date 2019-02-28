@@ -17,7 +17,7 @@
 import { Component, Prop, Vue } from 'vue-property-decorator';
 
 import playerModule from '../store/PlayerModule';
-import playlistService from '../service/PlaylistService';
+import serverEvents from '../service/ServerEventsService';
 import { Music, MusicDownloadState } from '../model/Music';
 
 const emptyMusic: Music = {
@@ -43,20 +43,28 @@ export default class Player extends Vue {
     return playerModule.playlist.playing;
   }
 
+  mounted() {
+    serverEvents.on('play', data => playerModule.playMusic(data.track));
+    serverEvents.on('stop', data => playerModule.stopMusic(data.track));
+    serverEvents.on('next', data => playerModule.nextMusic(data.track));
+    serverEvents.on('previous', data => playerModule.previousMusic(data.track));
+    serverEvents.on('enqueue', data => playerModule.enqueueMusic(data.music));
+  }
+
   previous() {
-    playlistService.previousMusic();
+    playerModule.previousMusic();
   }
 
   stop() {
-    playlistService.stopMusic();
+    playerModule.stopMusic();
   }
 
   play() {
-    playlistService.playMusic();
+    playerModule.playMusic();
   }
 
   next() {
-    playlistService.nextMusic();
+    playerModule.nextMusic();
   }
 }
 </script>
