@@ -101,7 +101,6 @@ export class MusicServiceImpl implements MusicService {
   }
 
   private createMusicFromVideoInfo(info: ytdl.videoInfo): Promise<Music> {
-    console.log(JSON.stringify(info.player_response.videoDetails.thumbnail));
     return this.musicRepository.create({
       videoId: info.video_id,
       title: info.title,

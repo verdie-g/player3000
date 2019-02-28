@@ -43,6 +43,8 @@ export class AudioPlayerImpl implements AudioPlayer {
   }
 
   public enqueue(music: Music, downloadPromise?: Promise<void>): Music {
+    logger.debug(`player: enqueue ${music.title}`);
+
     music.track = this.track;
     this.track += 1;
 
@@ -54,6 +56,8 @@ export class AudioPlayerImpl implements AudioPlayer {
     }
 
     if (!this.playing) {
+      logger.debug('player: nothing is playing');
+      this.playing = true;
       this.next();
     }
 
@@ -74,6 +78,65 @@ export class AudioPlayerImpl implements AudioPlayer {
     }
 
     this.playing = true;
+    this.playCurrent();
+  }
+
+  public stop() {
+    logger.debug('player: stop');
+
+    if (!this.playing) {
+      logger.debug('player: already stopped');
+      return;
+    }
+
+    this.stopVlc();
+    this.playing = false;
+  }
+
+  public next() {
+    logger.debug('player: next');
+
+    if (this.currentMusicIdx + 1 >= this.queue.length) {
+      logger.debug('player: out of bound');
+      return;
+    }
+
+    this.currentMusicIdx += 1;
+    if (!this.playing) {
+      logger.debug('player: not playing');
+      return;
+    }
+
+    this.stopVlc();
+    this.playCurrent();
+  }
+
+  public previous() {
+    logger.debug('player: previous');
+
+    if (this.currentMusicIdx - 1 < 0) {
+      logger.debug('player: out of bound');
+      return;
+    }
+
+    this.currentMusicIdx -= 1;
+    if (!this.playing) {
+      logger.debug('player: not playing');
+      return;
+    }
+
+    this.stopVlc();
+    this.playCurrent();
+  }
+
+  private playCurrent() {
+    logger.debug('player: play current');
+
+    if (this.currentMusicIdx < 0 || this.currentMusicIdx >= this.queue.length) {
+      logger.error('player: out of bound');
+      return;
+    }
+
     const current = this.queue[this.currentMusicIdx];
 
     if (current.ready) {
@@ -103,49 +166,11 @@ export class AudioPlayerImpl implements AudioPlayer {
     });
   }
 
-  public stop() {
-    logger.debug('player: stop');
-
-    if (!this.playing) {
-      logger.debug('player: already stopped');
-      return;
-    }
-
-    this.stopVlc();
-    this.playing = false;
-  }
-
-  public next() {
-    logger.debug('player: next');
-
-    if (this.currentMusicIdx + 1 >= this.queue.length) {
-      logger.debug('player: out of bound');
-      return;
-    }
-
-    this.stop();
-    this.currentMusicIdx += 1;
-    this.play();
-  }
-
-  public previous() {
-    logger.debug('player: previous');
-
-    if (this.currentMusicIdx - 1 < 0) {
-      logger.debug('player: out of bound');
-      return;
-    }
-
-    this.stop();
-    this.currentMusicIdx -= 1;
-    this.play();
-  }
-
   private startVlc(music: Music) {
     logger.debug('player: start vlc');
 
     if (this.vlcProcess) {
-      logger.warn('player: vlc is already started');
+      logger.error('player: vlc is already started');
       return;
     }
 
@@ -171,7 +196,7 @@ export class AudioPlayerImpl implements AudioPlayer {
     logger.debug('player: stop vlc');
 
     if (!this.vlcProcess) {
-      logger.warn('player: vlc is already stopped');
+      logger.debug('player: vlc is already stopped');
       return;
     }
 
