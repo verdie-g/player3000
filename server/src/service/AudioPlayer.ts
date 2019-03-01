@@ -188,7 +188,7 @@ export class AudioPlayerImpl implements AudioPlayer {
       return;
     }
 
-    const musicPath = path.join(MUSIC_FOLDER, music.title);
+    const musicPath = path.join(MUSIC_FOLDER, music.videoId);
     this.vlcProcess = spawn('cvlc', ['--no-video', '--play-and-exit', '--quiet', musicPath])
       .on('exit', (code) => {
         const log = code === 0 ? logger.info : logger.error;

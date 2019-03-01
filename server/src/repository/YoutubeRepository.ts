@@ -54,7 +54,7 @@ export class YoutubeRepositoryImpl implements YoutubeRepository  {
           resolve(videoInfo);
         });
 
-      const musicPath = path.join(MUSIC_FOLDER, videoInfo.title);
+      const musicPath = path.join(MUSIC_FOLDER, videoInfo.video_id);
       logger.info(`${videoInfo.title}: start downloading to ${musicPath}`);
       stream.pipe(fs.createWriteStream(musicPath));
     });
