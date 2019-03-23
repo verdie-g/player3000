@@ -1,15 +1,11 @@
-import * as config from 'config';
-import * as path from 'path';
 import { injectable, inject } from 'inversify';
-import { ChildProcess, spawn } from 'child_process';
 
 import TYPES from '../types';
+import { AudioProcess } from '../service/AudioProcess';
 import { Music } from '../model/Music';
 import { Playlist, PlaylistQueueItem } from '../model/Playlist';
 import { SSEService } from '../service/SSEService';
 import { logger } from '../util/Logger';
-
-const MUSIC_FOLDER: string = config.get('musicFolderPath');
 
 export interface AudioPlayer {
   getPlaylist(): Playlist;
@@ -25,17 +21,18 @@ export class AudioPlayerImpl implements AudioPlayer {
   @inject(TYPES.SSEService)
   private sseService!: SSEService;
 
+  @inject(TYPES.AudioProcess)
+  private audioProcess!: AudioProcess;
+
   private track: number;
   private queue: PlaylistQueueItem[];
   private currentMusicIdx: number;
-  private playing: boolean;          // player is waiting for a download to start or is playing
-  private vlcProcess?: ChildProcess; // if !== undefined => playing = true and a music is necessarily playing
+  private playing: boolean; // player is waiting for a download to start or is playing
 
   constructor() {
     this.track = 1;
     this.queue = [];
     this.currentMusicIdx = -1;
-    this.vlcProcess = undefined;
     this.playing = false;
   }
 
@@ -101,7 +98,7 @@ export class AudioPlayerImpl implements AudioPlayer {
     }
 
     this.sseService.send('stop', { track: this.current.music.track });
-    this.stopVlc();
+    this.audioProcess.stop();
     this.playing = false;
   }
 
@@ -120,7 +117,7 @@ export class AudioPlayerImpl implements AudioPlayer {
       return;
     }
 
-    this.stopVlc();
+    this.audioProcess.stop();
     this.playCurrent();
   }
 
@@ -139,7 +136,7 @@ export class AudioPlayerImpl implements AudioPlayer {
       return;
     }
 
-    this.stopVlc();
+    this.audioProcess.stop();
     this.playCurrent();
   }
 
@@ -155,7 +152,7 @@ export class AudioPlayerImpl implements AudioPlayer {
 
     if (current.ready) {
       logger.debug(`player: ${current.music.title} is ready`);
-      this.startVlc(current.music);
+      this.audioProcess.start(current.music, this.onMusicEnd);
       return;
     }
 
@@ -176,46 +173,12 @@ export class AudioPlayerImpl implements AudioPlayer {
         return;
       }
 
-      this.startVlc(current.music);
+      this.audioProcess.start(current.music, this.onMusicEnd);
     });
   }
 
-  private startVlc(music: Music) {
-    logger.debug('player: start vlc');
-
-    if (this.vlcProcess) {
-      logger.error('player: vlc is already started');
-      return;
-    }
-
-    const musicPath = path.join(MUSIC_FOLDER, music.videoId);
-    this.vlcProcess = spawn('cvlc', ['--no-video', '--play-and-exit', '--quiet', musicPath])
-      .on('exit', (code) => {
-        const log = code === 0 ? logger.info : logger.error;
-        log(`cvlc: exited with code ${code}`);
-
-        this.vlcProcess = undefined;
-        this.playing = false;
-        this.next();
-      });
-
-    this.vlcProcess.stderr.on('data', (data) => {
-      logger.warn(`player: cvlc: ${data}`);
-    });
-
-    logger.info(`player: ${music.title} starts playing`);
-  }
-
-  private stopVlc() {
-    logger.debug('player: stop vlc');
-
-    if (!this.vlcProcess) {
-      logger.debug('player: vlc is already stopped');
-      return;
-    }
-
-    this.vlcProcess.removeAllListeners('exit');
-    this.vlcProcess.kill();
-    this.vlcProcess = undefined;
+  private onMusicEnd() {
+    this.playing = false;
+    this.next();
   }
 }
