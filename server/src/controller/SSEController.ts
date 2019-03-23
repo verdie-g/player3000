@@ -8,8 +8,7 @@ import { SSEService } from '../service/SSEService';
 
 @injectable()
 export class SSEController implements RegistrableController {
-  @inject(TYPES.SSEService)
-  private sseService!: SSEService;
+  constructor(@inject(TYPES.SSEService) private sseService: SSEService) {}
 
   public routes(): Route[] {
     return [

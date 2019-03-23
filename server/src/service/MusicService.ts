@@ -25,17 +25,12 @@ export interface MusicService {
 
 @injectable()
 export class MusicServiceImpl implements MusicService {
-  @inject(TYPES.SSEService)
-  private sseService!: SSEService;
-
-  @inject(TYPES.AudioPlayer)
-  private audioPlayer!: AudioPlayer;
-
-  @inject(TYPES.YoutubeRepository)
-  private youtubeRepository!: YoutubeRepository;
-
-  @inject(TYPES.MusicRepository)
-  private musicRepository!: MusicRepository;
+  constructor(
+    @inject(TYPES.SSEService) private sseService: SSEService,
+    @inject(TYPES.AudioPlayer) private audioPlayer: AudioPlayer,
+    @inject(TYPES.YoutubeRepository) private youtubeRepository: YoutubeRepository,
+    @inject(TYPES.MusicRepository) private musicRepository: MusicRepository,
+  ) {}
 
   public async searchMusic(query: string): Promise<Music[]> {
     const ytRes: YoutubeSearchResponse = await this.youtubeRepository.search(query);

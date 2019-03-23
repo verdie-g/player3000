@@ -9,8 +9,7 @@ import { serviceResultToResponse } from '../util/ControllerUtils';
 
 @injectable()
 export class MusicController implements RegistrableController {
-  @inject(TYPES.MusicService)
-  private musicService!: MusicService;
+  constructor(@inject(TYPES.MusicService) private musicService: MusicService) {}
 
   public routes(): Route[] {
     return [

@@ -18,18 +18,15 @@ export interface AudioPlayer {
 
 @injectable()
 export class AudioPlayerImpl implements AudioPlayer {
-  @inject(TYPES.SSEService)
-  private sseService!: SSEService;
-
-  @inject(TYPES.AudioProcess)
-  private audioProcess!: AudioProcess;
-
   private track: number;
   private queue: PlaylistQueueItem[];
   private currentMusicIdx: number;
   private playing: boolean; // player is waiting for a download to start or is playing
 
-  constructor() {
+  constructor(
+    @inject(TYPES.SSEService) private sseService: SSEService,
+    @inject(TYPES.AudioProcess) private audioProcess: AudioProcess,
+  ) {
     this.track = 1;
     this.queue = [];
     this.currentMusicIdx = -1;
