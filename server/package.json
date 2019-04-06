@@ -8,8 +8,9 @@
   "scripts": {
     "start": "NODE_ENV=development node_modules/.bin/nodemon --exec 'yarn lint && node_modules/.bin/ts-node src/index.ts'",
     "debug": "NODE_ENV=development node_modules/.bin/nodemon --exec 'yarn lint && node_modules/.bin/ts-node -d src/index.ts'",
+    "test": "NODE_ENV=test mocha -r ts-node/register test/*.ts",
     "prod": "NODE_ENV=production node_modules/.bin/ts-node src/index.ts",
-    "lint": "node_modules/.bin/tslint --project tsconfig.json 'src/**/*.ts' -t verbose --force",
+    "lint": "node_modules/.bin/tslint --project tsconfig.json '{src,test}/**/*.ts' -t verbose --force",
     "migrate:make": "node_modules/.bin/knex --knexfile ./config/knexfile.js migrate:make",
     "migrate:latest": "node_modules/.bin/knex --knexfile ./config/knexfile.js migrate:latest",
     "migrate:rollback": "node_modules/.bin/knex --knexfile ./config/knexfile.js migrate:rollback"
@@ -34,12 +35,15 @@
     "@types/koa": "^2.0.47",
     "@types/koa-bodyparser": "^4.2.1",
     "@types/koa__cors": "^2.2.3",
+    "@types/mocha": "^5.2.6",
     "@types/node-fetch": "^2.1.6",
     "@types/winston": "^2.4.4",
+    "mocha": "^6.0.2",
     "nodemon": "^1.18.7",
     "ts-node": "^7.0.1",
     "tslint": "^5.11.0",
     "tslint-config-airbnb": "^5.11.1",
+    "typemoq": "^2.1.0",
     "typescript": "^3.2.2"
   }
 }
