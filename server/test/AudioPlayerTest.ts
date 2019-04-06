@@ -55,14 +55,14 @@ describe('AudioPlayer', () => {
       const audioProcess = Mock.ofType<AudioProcess>();
       const audioPlayer = new AudioPlayerImpl(sseService.object, audioProcess.object);
 
-      audioPlayer.enqueue(musicA, Promise.resolve());
+      audioPlayer.enqueue(musicA);
       let playlist = audioPlayer.getPlaylist();
 
       assert.strictEqual(playlist.queue.length, 1);
       assert.strictEqual(playlist.currentIdx, 0);
       assert.strictEqual(playlist.queue[0].id, musicA.id);
 
-      audioPlayer.enqueue(musicB, Promise.resolve());
+      audioPlayer.enqueue(musicB);
       playlist = audioPlayer.getPlaylist();
 
       assert.strictEqual(playlist.queue.length, 2);
@@ -75,7 +75,7 @@ describe('AudioPlayer', () => {
       const audioProcess = Mock.ofType<AudioProcess>();
       const audioPlayer = new AudioPlayerImpl(sseService.object, audioProcess.object);
 
-      audioPlayer.enqueue(musicA, Promise.resolve());
+      audioPlayer.enqueue(musicA);
 
       const playlist = audioPlayer.getPlaylist();
       assert.strictEqual(playlist.playing, true);
@@ -86,9 +86,9 @@ describe('AudioPlayer', () => {
       const audioProcess = Mock.ofType<AudioProcess>();
       const audioPlayer = new AudioPlayerImpl(sseService.object, audioProcess.object);
 
-      audioPlayer.enqueue(musicA, Promise.resolve());
+      audioPlayer.enqueue(musicA);
       audioPlayer.stop();
-      audioPlayer.enqueue(musicB, Promise.resolve());
+      audioPlayer.enqueue(musicB);
       const playlist = audioPlayer.getPlaylist();
       assert.strictEqual(playlist.playing, false);
     });
@@ -100,7 +100,7 @@ describe('AudioPlayer', () => {
       const audioProcess = Mock.ofType<AudioProcess>();
       const audioPlayer = new AudioPlayerImpl(sseService.object, audioProcess.object);
 
-      audioPlayer.enqueue(musicA, Promise.resolve());
+      audioPlayer.enqueue(musicA);
       audioPlayer.stop();
       audioPlayer.play();
       const playlist = audioPlayer.getPlaylist();
@@ -124,7 +124,7 @@ describe('AudioPlayer', () => {
       const audioProcess = Mock.ofType<AudioProcess>();
       const audioPlayer = new AudioPlayerImpl(sseService.object, audioProcess.object);
 
-      audioPlayer.enqueue(musicA, Promise.resolve());
+      audioPlayer.enqueue(musicA);
       audioPlayer.play();
       const playlist = audioPlayer.getPlaylist();
       assert.strictEqual(playlist.playing, true);
@@ -138,7 +138,7 @@ describe('AudioPlayer', () => {
       const audioProcess = Mock.ofType<AudioProcess>();
       const audioPlayer = new AudioPlayerImpl(sseService.object, audioProcess.object);
 
-      audioPlayer.enqueue(musicA, Promise.resolve());
+      audioPlayer.enqueue(musicA);
       audioPlayer.stop();
       const playlist = audioPlayer.getPlaylist();
       assert.strictEqual(playlist.playing, false);
@@ -161,7 +161,7 @@ describe('AudioPlayer', () => {
       const audioProcess = Mock.ofType<AudioProcess>();
       const audioPlayer = new AudioPlayerImpl(sseService.object, audioProcess.object);
 
-      audioPlayer.enqueue(musicA, Promise.resolve());
+      audioPlayer.enqueue(musicA);
       audioPlayer.stop();
       audioPlayer.stop();
       const playlist = audioPlayer.getPlaylist();
@@ -176,8 +176,8 @@ describe('AudioPlayer', () => {
       const audioProcess = Mock.ofType<AudioProcess>();
       const audioPlayer = new AudioPlayerImpl(sseService.object, audioProcess.object);
 
-      audioPlayer.enqueue(musicA, Promise.resolve());
-      audioPlayer.enqueue(musicB, Promise.resolve());
+      audioPlayer.enqueue(musicA);
+      audioPlayer.enqueue(musicB);
       audioPlayer.next();
 
       const playlist = audioPlayer.getPlaylist();
@@ -201,7 +201,7 @@ describe('AudioPlayer', () => {
       const audioProcess = Mock.ofType<AudioProcess>();
       const audioPlayer = new AudioPlayerImpl(sseService.object, audioProcess.object);
 
-      audioPlayer.enqueue(musicA, Promise.resolve());
+      audioPlayer.enqueue(musicA);
       audioPlayer.next();
 
       const playlist = audioPlayer.getPlaylist();
@@ -216,8 +216,8 @@ describe('AudioPlayer', () => {
       const audioProcess = Mock.ofType<AudioProcess>();
       const audioPlayer = new AudioPlayerImpl(sseService.object, audioProcess.object);
 
-      audioPlayer.enqueue(musicA, Promise.resolve());
-      audioPlayer.enqueue(musicB, Promise.resolve());
+      audioPlayer.enqueue(musicA);
+      audioPlayer.enqueue(musicB);
       audioPlayer.next();
       audioPlayer.previous();
 
@@ -242,7 +242,7 @@ describe('AudioPlayer', () => {
       const audioProcess = Mock.ofType<AudioProcess>();
       const audioPlayer = new AudioPlayerImpl(sseService.object, audioProcess.object);
 
-      audioPlayer.enqueue(musicA, Promise.resolve());
+      audioPlayer.enqueue(musicA);
       audioPlayer.previous();
 
       const playlist = audioPlayer.getPlaylist();
@@ -281,8 +281,8 @@ describe('AudioPlayer', () => {
       const sseService = Mock.ofType<SSEService>();
       const audioPlayer = new AudioPlayerImpl(sseService.object, audioProcess.object);
 
-      audioPlayer.enqueue(musicA, Promise.resolve());
-      audioPlayer.enqueue(musicB, Promise.resolve());
+      audioPlayer.enqueue(musicA);
+      audioPlayer.enqueue(musicB);
     });
   });
 });
