@@ -184,6 +184,20 @@ describe('AudioPlayer', () => {
       assert.strictEqual(playlist.queue[playlist.currentIdx].id, musicB.id);
     });
 
+    it('shouldn\'t play when stopped', () => {
+      const sseService = Mock.ofType<SSEService>();
+      const audioProcess = Mock.ofType<AudioProcess>();
+      const audioPlayer = new AudioPlayerImpl(sseService.object, audioProcess.object);
+
+      audioPlayer.enqueue(musicA);
+      audioPlayer.enqueue(musicB);
+      audioPlayer.stop();
+      audioPlayer.next();
+
+      const playlist = audioPlayer.getPlaylist();
+      assert.strictEqual(playlist.playing, false);
+    });
+
     it('shouldn\'t do anything when the queue is empty', () => {
       const sseService = Mock.ofType<SSEService>();
       const audioProcess = Mock.ofType<AudioProcess>();
@@ -223,6 +237,21 @@ describe('AudioPlayer', () => {
 
       const playlist = audioPlayer.getPlaylist();
       assert.strictEqual(playlist.queue[playlist.currentIdx].id, musicA.id);
+    });
+
+    it('shouldn\'t play when stopped', () => {
+      const sseService = Mock.ofType<SSEService>();
+      const audioProcess = Mock.ofType<AudioProcess>();
+      const audioPlayer = new AudioPlayerImpl(sseService.object, audioProcess.object);
+
+      audioPlayer.enqueue(musicA);
+      audioPlayer.enqueue(musicB);
+      audioPlayer.next();
+      audioPlayer.stop();
+      audioPlayer.previous();
+
+      const playlist = audioPlayer.getPlaylist();
+      assert.strictEqual(playlist.playing, false);
     });
 
     it('shouldn\'t do anything when the queue is empty', () => {
