@@ -76,7 +76,7 @@ export class AudioPlayerImpl implements AudioPlayer {
       return;
     }
 
-    if (this.currentMusicIdx >= this.queue.length) {
+    if (this.currentMusicIdx >= this.queue.length || this.currentMusicIdx < 0) {
       logger.debug('player: out of bound');
       return;
     }
