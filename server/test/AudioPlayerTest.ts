@@ -103,6 +103,7 @@ describe('AudioPlayer', () => {
       audioPlayer.enqueue(musicA);
       audioPlayer.stop();
       audioPlayer.play();
+
       const playlist = audioPlayer.getPlaylist();
       assert.strictEqual(playlist.playing, true);
       assert.strictEqual(playlist.queue[playlist.currentIdx].id, musicA.id);
@@ -126,6 +127,7 @@ describe('AudioPlayer', () => {
 
       audioPlayer.enqueue(musicA);
       audioPlayer.play();
+
       const playlist = audioPlayer.getPlaylist();
       assert.strictEqual(playlist.playing, true);
       assert.strictEqual(playlist.queue[playlist.currentIdx].id, musicA.id);
@@ -140,6 +142,7 @@ describe('AudioPlayer', () => {
 
       audioPlayer.enqueue(musicA);
       audioPlayer.stop();
+
       const playlist = audioPlayer.getPlaylist();
       assert.strictEqual(playlist.playing, false);
       assert.strictEqual(playlist.queue[playlist.currentIdx].id, musicA.id);
@@ -151,6 +154,7 @@ describe('AudioPlayer', () => {
       const audioPlayer = new AudioPlayerImpl(sseService.object, audioProcess.object);
 
       audioPlayer.stop();
+
       const playlist = audioPlayer.getPlaylist();
       assert.strictEqual(playlist.playing, false);
       assert.strictEqual(playlist.queue.length, 0);
@@ -290,6 +294,7 @@ describe('AudioPlayer', () => {
       audioPlayer.enqueue(musicA, downloadPromise);
       audioPlayer.stop();
       await downloadPromise;
+
       const playlist = audioPlayer.getPlaylist();
       assert.strictEqual(playlist.playing, false);
     });
