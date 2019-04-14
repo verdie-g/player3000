@@ -8,22 +8,22 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "buefy": "^0.7.2",
+    "buefy": "^0.7.4",
     "debounce": "^1.2.0",
-    "vue": "^2.6.7",
-    "vue-class-component": "^7.0.1",
-    "vue-property-decorator": "^7.0.0",
+    "vue": "^2.6.10",
+    "vue-class-component": "^7.0.2",
+    "vue-property-decorator": "^8.1.0",
     "vuex": "^3.0.1"
   },
   "devDependencies": {
     "@types/debounce": "^1.2.0",
     "@types/eventsource": "^1.1.0",
-    "@vue/cli-plugin-typescript": "^3.4.1",
-    "@vue/cli-service": "^3.4.1",
-    "tslint": "^5.12.1",
+    "@vue/cli-plugin-typescript": "^3.6.0",
+    "@vue/cli-service": "^3.6.0",
+    "tslint": "^5.15.0",
     "tslint-config-airbnb": "^5.11.1",
-    "typescript": "^3.3.3333",
-    "vue-template-compiler": "^2.6.7",
+    "typescript": "^3.4.3",
+    "vue-template-compiler": "^2.6.10",
     "vuex-module-decorators": "^0.9.8"
   }
 }
