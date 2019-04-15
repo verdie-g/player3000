@@ -149,7 +149,7 @@ export class AudioPlayerImpl implements AudioPlayer {
 
     if (current.ready) {
       logger.debug(`player: ${current.music.title} is ready`);
-      this.audioProcess.start(current.music, this.onMusicEnd);
+      this.audioProcess.start(current.music, this.onMusicEnd.bind(this));
       return;
     }
 
@@ -170,7 +170,7 @@ export class AudioPlayerImpl implements AudioPlayer {
         return;
       }
 
-      this.audioProcess.start(current.music, this.onMusicEnd);
+      this.audioProcess.start(current.music, this.onMusicEnd.bind(this));
     });
   }
 
