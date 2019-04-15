@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost:8000';
+const BASE_URL = process.env.VUE_APP_API_URL;
 
 const HEADERS = new Headers({
   'Content-Type': 'application/json; charset=utf-8',

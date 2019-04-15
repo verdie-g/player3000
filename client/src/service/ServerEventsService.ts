@@ -1,4 +1,4 @@
-const URL = 'http://localhost:8000/sse';
+const SSE_ENDPOINT = `${process.env.VUE_APP_API_URL}/sse`;
 
 import EventSource from 'eventsource';
 
@@ -6,7 +6,7 @@ export class ServerEventsService {
   eventSource: EventSource;
 
   constructor() {
-    this.eventSource = new EventSource(URL);
+    this.eventSource = new EventSource(SSE_ENDPOINT);
   }
 
   on(event: string, cb: (data: any) => void): this {
