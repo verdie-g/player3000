@@ -1,7 +1,6 @@
 import * as knex from 'knex';
 
-const environment = process.env.ENVIRONMENT || 'development';
-const knexConf: knex.Config = require('../../config/knexfile')[environment];
+const knexConf: knex.Config = require('../../config/knexfile');
 
 export default require('knex')({
   ...knexConf,
